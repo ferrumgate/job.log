@@ -1,4 +1,4 @@
-import { logger, RedisService, RedisWatcherService, Util } from "rest.portal"
+import { logger, RedisService, Util } from "rest.portal"
 import { ActivityLogToES } from "./activityLogToES";
 import { AuditLogToES } from "./auditLogToES";
 import { Leader } from "./leader";

@@ -1,6 +1,8 @@
+
+import EventEmitter from "node:events";
 import { logger, PingService, RedisService, RedLockService, Util } from "rest.portal";
 const { setIntervalAsync, clearIntervalAsync } = require('set-interval-async');
-import { EventEmitter } from "stream";
+
 
 export class Leader {
     events: EventEmitter = new EventEmitter();

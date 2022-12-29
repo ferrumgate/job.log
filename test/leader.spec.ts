@@ -1,11 +1,10 @@
 
 import chai from 'chai';
-import chaiHttp from 'chai-http';
 import { RedisService, Util } from 'rest.portal';
 import { Leader } from '../src/leader';
 
 
-chai.use(chaiHttp);
+
 const expect = chai.expect;
 
 

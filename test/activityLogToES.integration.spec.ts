@@ -1,12 +1,12 @@
 
 import chai from 'chai';
-import chaiHttp from 'chai-http';
+
 import { ActivityLog, ActivityService, ConfigService, ESService, RedisService, RedisWatcherService, Util } from 'rest.portal';
 import { Leader } from '../src/leader';
 import { ActivityLogToES } from '../src/activityLogToES';
 
 
-chai.use(chaiHttp);
+
 const expect = chai.expect;
 
 
