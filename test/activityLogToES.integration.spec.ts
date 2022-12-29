@@ -2,6 +2,7 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { ActivityLog, ActivityService, ConfigService, ESService, RedisService, RedisWatcherService, Util } from 'rest.portal';
+import { Leader } from '../src/leader';
 import { ActivityLogToES } from '../src/activityLogToES';
 
 
@@ -59,8 +60,8 @@ describe('activityLogToES ', async () => {
         await activityService.save(log2);
 
         await es.reset();
-        const watcher = new RedisWatcherService();
-        await watcher.start();
+        const watcher = new Leader('redis', redis, 'localhost');
+        watcher.isMe = true;
         const activityLog = new Mock(redis, watcher);
         await activityLog.start();
         await activityLog.stop();

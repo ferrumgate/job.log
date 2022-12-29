@@ -1,4 +1,5 @@
 import { ActivityLog, ConfigService, ESService, ESServiceLimited, logger, RedisService, RedisWatcherService, Util } from "rest.portal";
+import { Leader } from "./leader";
 
 
 const { setIntervalAsync, clearIntervalAsync } = require('set-interval-async');
@@ -17,7 +18,7 @@ export class ActivityLogToES {
     es: ESService;
 
     constructor(private redis: RedisService,
-        private redisWatcher: RedisWatcherService) {
+        private leader: Leader) {
         this.es = this.createESService();
 
     }
@@ -45,8 +46,7 @@ export class ActivityLogToES {
     async check() {
         try {
 
-            if (!this.redisWatcher.isMaster) {
-                await Util.sleep(5000);
+            if (!this.leader.isMe) {
                 return;
             }
             if (!this.lastPos) {
@@ -57,12 +57,14 @@ export class ActivityLogToES {
                     this.lastPos = '0';
 
             }
-            while (true) {
+            while (this.leader.isMe) {
                 const items = await this.redis.xread(this.activityStreamKey, 10000, this.lastPos, 5000);
                 logger.info(`activity logs getted size: ${items.length}`);
                 let pushItems = [];
                 let unknownItemsCount = 0;
                 for (const item of items) {
+                    if (!this.leader.isMe) return;
+
                     this.lastPos = item.xreadPos;
                     try {
                         if (item.type == 'b64') {

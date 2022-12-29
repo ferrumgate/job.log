@@ -2,6 +2,7 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { AuditLog, AuditService, ConfigService, ESService, RedisService, RedisWatcherService, Util } from 'rest.portal';
+import { Leader } from '../src/leader';
 import { AuditLogToES } from '../src/auditLogToES';
 
 
@@ -70,9 +71,9 @@ describe('auditLogToES ', async () => {
         await auditService.saveToRedis(log2);
 
         await es.reset();
-        const watcher = new RedisWatcherService();
-        await watcher.start();
-        const auditLog = new Mock(configService, redis, watcher);
+        const watcher = new Leader('redis', redis, 'localhost');
+        watcher.isMe = true;
+        const auditLog = new Mock(configService.getEncKey(), redis, watcher);
         await auditLog.start();
 
         await auditLog.stop();

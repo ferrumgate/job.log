@@ -1,5 +1,6 @@
-import { ConfigService, ESService, ESServiceLimited, logger, RedisService, RedisWatcherService, Util } from "rest.portal";
+import { ESService, ESServiceLimited, logger, RedisService, RedisWatcherService, Util } from "rest.portal";
 import { AuditLog } from "rest.portal/model/auditLog";
+import { Leader } from "./leader";
 
 const { setIntervalAsync, clearIntervalAsync } = require('set-interval-async');
 
@@ -19,9 +20,9 @@ export class AuditLogToES {
     public encKey = '';
     es: ESService;
 
-    constructor(private configService: ConfigService, private redis: RedisService,
-        private redisWatcher: RedisWatcherService) {
-        this.encKey = this.configService.getEncKey();
+    constructor(encKey: string, private redis: RedisService,
+        private leader: Leader) {
+        this.encKey = encKey;
         this.es = this.createESService();
 
     }
@@ -49,8 +50,7 @@ export class AuditLogToES {
     async check() {
         try {
 
-            if (!this.redisWatcher.isMaster) {
-                await Util.sleep(5000);
+            if (!this.leader.isMe) {
                 return;
             }
             if (!this.lastPos) {
@@ -61,12 +61,13 @@ export class AuditLogToES {
                     this.lastPos = '0';
 
             }
-            while (true) {
+            while (this.leader.isMe) {
                 const items = await this.redis.xread(this.auditStreamKey, 10000, this.lastPos, 5000);
                 logger.info(`audit logs getted size: ${items.length}`);
                 let pushItems = [];
 
                 for (const item of items) {
+                    if (!this.leader.isMe) return;
                     try {
                         this.lastPos = item.xreadPos;
                         const message = Util.decrypt(this.encKey, item.data, 'base64');
@@ -81,7 +82,6 @@ export class AuditLogToES {
                 }
                 if (pushItems.length) {
                     await this.es.auditSave(pushItems);
-
                     logger.info(`audit logs written to es size: ${pushItems.length}`)
                 }
                 if (items.length)
