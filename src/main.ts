@@ -16,10 +16,30 @@ async function main() {
     await activity.start();
     await audit.start();
 
+    process.on('SIGINT', async () => {
+        logger.warn("sigint catched");
+        await activity.stop();
+        await audit.stop();
+        await leader.stop();
+        logger.warn("sigint catched");
+        process.exit(0);
+
+    });
+    process.on('SIGTERM', async () => {
+        logger.warn("sigterm catched");
+        await activity.stop();
+        await audit.stop();
+        await leader.stop();
+        logger.warn("sigterm catched");
+        process.exit(0);
+
+    });
+
 
 }
 
-main().catch(err => {
-    logger.error(err);
-    process.exit(1);
-})
+main()
+    .catch(err => {
+        logger.error(err);
+        process.exit(1);
+    })
