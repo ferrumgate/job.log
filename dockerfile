@@ -1,4 +1,4 @@
-FROM node:16.13.2-bullseye-slim
+FROM node:18.12.1-bullseye-slim
 RUN apt update &&\
     apt install --assume-yes --no-install-recommends openssl \
     ca-certificates gnupg iputils-ping
@@ -33,7 +33,8 @@ WORKDIR /usr/src/app
 #RUN chown -R  node /usr/src/app
 ### delete sensitive test data
 
-
+RUN mkdir -p /var/run/ferrumgate && chown node:node /var/run/ferrumgate
 USER node
+
 CMD ["npm","run","startdocker"]
 #CMD ["node","./build/src/main.js"]
