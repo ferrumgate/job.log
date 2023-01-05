@@ -68,8 +68,8 @@ export class ActivityLogToES {
                     this.lastPos = item.xreadPos;
                     try {
                         if (item.type == 'b64') {
-                            const message = Buffer.from(item.data, 'base64').toString();
-                            const log = JSON.parse(message) as ActivityLog;
+                            const message = Buffer.from(item.data, 'base64');// Buffer.from(item.data, 'base64').toString();
+                            const log = Util.jdecode(message) as ActivityLog;// JSON.parse(message) as ActivityLog;
 
                             const nitem = await this.es.activityCreateIndexIfNotExits(log)
                             pushItems.push(nitem);

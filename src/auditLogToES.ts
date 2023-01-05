@@ -70,8 +70,8 @@ export class AuditLogToES {
                     if (!this.leader.isMe) return;
                     try {
                         this.lastPos = item.xreadPos;
-                        const message = Util.decrypt(this.encKey, item.data, 'base64');
-                        const log = JSON.parse(message) as AuditLog;
+                        const message = Util.jdecrypt(this.encKey, Buffer.from(item.data, 'base64')); // Util.decrypt(this.encKey, item.data, 'base64');
+                        const log = Util.jdecode(message) as AuditLog; //JSON.parse(message) as AuditLog;
                         const nitem = await this.es.auditCreateIndexIfNotExits(log)
                         pushItems.push(nitem);
 
