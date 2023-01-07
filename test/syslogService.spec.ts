@@ -5,9 +5,9 @@
 import chai from 'chai';
 
 import { RedisService, SystemLogService, Util } from 'rest.portal';
-import { SyslogService } from '../src/syslogService';
+import { SyslogService, SyslogUdpService } from '../src/syslogService';
 import net from 'node:net';
-
+import udp from 'node:dgram';
 
 
 const expect = chai.expect;
@@ -113,3 +113,37 @@ describe('syslogService', () => {
 
     })
 })
+
+
+
+describe('syslogUdpService', () => {
+    const simpleRedis = new RedisService();
+    beforeEach(async () => {
+        await simpleRedis.flushAll();
+
+
+    })
+
+    it('read/write', async () => {
+
+        const log = '/logs/test';
+        const syslog = new SyslogUdpService(5555, new RedisService(), new RedisService(), log);
+        await syslog.start();
+        const client = udp.createSocket('udp4');
+        client.send('hello', 5555);
+        await Util.sleep(5000);
+        const result = await simpleRedis.xread(log, 1000, '0', 100);
+
+        client.close();
+        await Util.sleep(1000);
+        await syslog.stop();
+        expect(result.length).to.equal(1);
+
+
+    }).timeout(150000)
+
+
+})
+
+
+
