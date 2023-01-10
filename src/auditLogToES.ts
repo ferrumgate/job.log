@@ -1,4 +1,4 @@
-import { ESService, ESServiceLimited, logger, RedisService, RedisWatcherService, Util } from "rest.portal";
+import { ESService, ESServiceLimited, logger, RedisService, RedisWatcherService, Util, WatchGroupService, WatchItem } from "rest.portal";
 import { AuditLog } from "rest.portal/model/auditLog";
 import { Leader } from "./leader";
 
@@ -12,17 +12,15 @@ export class AuditLogToES {
     /**
      *
      */
-    lastPos = '';
-    timer: any;
-    isRedisMaster = false;
-    lastRedisMasterCheck = 0;
-    auditStreamKey = '/logs/audit';
-    public encKey = '';
-    es: ESService;
 
-    constructor(encKey: string, private redis: RedisService,
+    auditStreamKey = '/logs/audit';
+    es: ESService;
+    watchGroup: WatchGroupService;
+    constructor(encKey: string, private redis: RedisService, private redisStream: RedisService,
         private leader: Leader) {
-        this.encKey = encKey;
+        this.watchGroup = new WatchGroupService(this.redis, this.redisStream, "job.log", Util.randomNumberString(16), this.auditStreamKey, '0', 24 * 60 * 60 * 1000, encKey, 10000, async (data: any[]) => {
+            await this.processData(data);
+        })
         this.es = this.createESService();
 
     }
@@ -34,64 +32,32 @@ export class AuditLogToES {
     }
 
 
-
     async start() {
-        await this.check();
-        this.timer = setIntervalAsync(async () => {
-            await this.check()
-        }, 5000)
+        await this.watchGroup.start(true);
     }
     async stop() {
-        if (this.timer)
-            clearIntervalAsync(this.timer);
-        this.timer = null;
+        await this.watchGroup.stop(true);
     }
 
-    async check() {
-        try {
-
-            if (!this.leader.isMe) {
-                return;
-            }
-            if (!this.lastPos) {
-                const pos = await this.redis.get('/logs/audit/pos', false) as string;
-                if (pos)
-                    this.lastPos = pos;
-                else
-                    this.lastPos = '0';
-
-            }
-            while (this.leader.isMe) {
-                const items = await this.redis.xread(this.auditStreamKey, 10000, this.lastPos, 5000);
-                logger.info(`audit logs getted size: ${items.length}`);
-                let pushItems = [];
-
-                for (const item of items) {
-                    if (!this.leader.isMe) return;
-                    try {
-                        this.lastPos = item.xreadPos;
-                        const message = Util.jdecrypt(this.encKey, Buffer.from(item.data, 'base64')); // Util.decrypt(this.encKey, item.data, 'base64');
-                        const log = Util.jdecode(message) as AuditLog; //JSON.parse(message) as AuditLog;
-                        const nitem = await this.es.auditCreateIndexIfNotExits(log)
-                        pushItems.push(nitem);
 
 
-                    } catch (err) {
-                        logger.error(err);
-                    }
-                }
-                if (pushItems.length) {
-                    await this.es.auditSave(pushItems);
-                    logger.info(`audit logs written to es size: ${pushItems.length}`)
-                }
-                if (items.length)
-                    await this.redis.set('/logs/audit/pos', this.lastPos);
-                if (!items.length)
-                    break;
+    async processData(datas: WatchItem<AuditLog>[]) {
+        let pushItems = [];
+        for (const data of datas) {
+            const log = data.val;
+            try {
+
+                const nitem = await this.es.auditCreateIndexIfNotExits(log);
+                pushItems.push(nitem);
+
+            } catch (err) {
+                logger.error(err);
             }
 
-        } catch (err) {
-            logger.error(err);
+        }
+        if (pushItems.length) {
+            await this.es.auditSave(pushItems);
+            logger.info(`audit logs written to es size: ${pushItems.length}`)
         }
     }
 

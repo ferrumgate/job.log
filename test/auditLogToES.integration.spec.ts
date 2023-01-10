@@ -16,10 +16,10 @@ const esHost = 'https://192.168.88.250:9200';
 const esUser = "elastic";
 const esPass = '123456';
 describe('auditLogToES ', async () => {
-
+    const redis = new RedisService();
     beforeEach(async () => {
-        //const redis = new RedisService();
-        //await redis.flushAll();
+
+        await redis.flushAll();
 
     })
 
@@ -63,7 +63,9 @@ describe('auditLogToES ', async () => {
 
         const redis = new RedisService();
         await redis.flushAll();
+        const redis2 = new RedisService();
         const es = new ESService(esHost, esUser, esPass);
+
         const { log1, log2 } = createSampleData();
 
         const auditService = new AuditService(configService, redis, es);
@@ -72,21 +74,21 @@ describe('auditLogToES ', async () => {
 
         await es.reset();
         const watcher = new Leader('redis', redis, 'localhost');
-        watcher.isMe = true;
-        const auditLog = new Mock(configService.getEncKey(), redis, watcher);
+        watcher.isMe = true;//no need anymore
+        const auditLog = new Mock(configService.getEncKey(), redis, redis2, watcher);
         await auditLog.start();
-
+        await Util.sleep(15000);
         await auditLog.stop();
-        await Util.sleep(5000);
-        /*   const result = await es.search({
-              index: 'ferrumgate-audit', body: {
-                  query: {
-                      match_all: {}
-                  }
-              }
-          }) */
-        const redisPos = await redis.get('/logs/audit/pos', false);
-        expect(redisPos).exist;
+        /* await Util.sleep(45000);
+        const result = await es.search({
+            index: 'ferrumgate-audit', body: {
+                query: {
+                    match_all: {}
+                }
+            }
+        })
+        expect(result.hits.total.value > 0).to.be.true;
+ */
 
 
     }).timeout(200000);

@@ -4,7 +4,7 @@
   "description": "manages system logs",
   "main": "main.js",
   "scripts": {
-    "test": "NODE_ENV=development DEBUG2=nock.* node ./node_modules/mocha/bin/mocha --exit --timeout 30000 --require ts-node/register test/**/syslogService.spec.ts",
+    "test": "NODE_ENV=development DEBUG2=nock.* node ./node_modules/mocha/bin/mocha --exit --timeout 30000 --require ts-node/register test/**/**.spec.ts",
     "testintegration": "DEBUG=nock.* node ./node_modules/mocha/bin/mocha --exit  --require ts-node/register test/**/*.spec.integration.ts",
     "build": "tsc ",
     "start": "tsc && NODE_ENV=development  node ./build/src/main.js",
@@ -23,6 +23,7 @@
   },
   "homepage": "https://gitlab.com/ferrumgate/job.log#readme",
   "dependencies": {
+    "node-cache": "^5.1.2",
     "rest.portal": "file:../rest.portal/build/src",
     "set-interval-async": "^3.0.2"
   },

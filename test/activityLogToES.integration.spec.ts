@@ -52,6 +52,7 @@ describe('activityLogToES ', async () => {
         //let configService = new ConfigService('AuX165Jjz9VpeOMl3msHbNAncvDYezMg', filename);
         const redis = new RedisService();
         await redis.flushAll();
+        const redis2 = new RedisService();
         const es = new ESService(esHost, esUser, esPass);
         const { log1, log2 } = createSampleData();
 
@@ -61,20 +62,21 @@ describe('activityLogToES ', async () => {
 
         await es.reset();
         const watcher = new Leader('redis', redis, 'localhost');
-        watcher.isMe = true;
-        const activityLog = new Mock(redis, watcher);
+        //watcher.isMe = true;
+        const activityLog = new Mock(redis, redis2, watcher);
         await activityLog.start();
+        await Util.sleep(15000);
         await activityLog.stop();
-        await Util.sleep(5000);
-        /*  const result = await es.search({
-             index: 'ferrumgate-activity', body: {
-                 query: {
-                     match_all: {}
-                 }
-             }
-         }) */
-        const redisPos = await redis.get('/logs/activity/pos', false);
-        expect(redisPos).exist;
+        //await Util.sleep(120000);
+        /* const result = await es.search({
+            index: 'ferrumgate-activity', body: {
+                query: {
+                    match_all: {}
+                }
+            }
+        }) */
+        // expect(result.hits.total.value > 0).to.be.true;
+
 
 
     }).timeout(200000);
