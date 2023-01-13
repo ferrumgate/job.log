@@ -96,7 +96,7 @@ export class SyslogUdpService {
 
 
         this.server.on('message', async (data: Buffer) => {
-            logger.info(`data received ${data.toString()}`);
+            logger.debug(`data received ${data.toString()}`);
             await this.log.write(data.toString('utf-8'));
         })
 

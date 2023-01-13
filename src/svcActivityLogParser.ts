@@ -8,6 +8,7 @@ export class SvcActivityLogParser {
     logs = `/logs/activity/svc`;
     logWatcher: WatchGroupService;
 
+
     es: ESService;
     constructor(private redis: RedisService, private redisStream: RedisService, private encKey: string,
         private configService: RedisConfigWatchCachedService, private systemWatcher: SystemWatchService) {
@@ -18,6 +19,10 @@ export class SvcActivityLogParser {
                 await this.processData(data);
             })
         this.es = this.createESService();
+        //when first install
+        setTimeout(async () => {
+            await this.createAFakeRecord();
+        }, 5000);
 
     }
     protected createESService() {
@@ -25,6 +30,15 @@ export class SvcActivityLogParser {
             return new ESServiceLimited(process.env.ES_HOST, process.env.ES_USER, process.env.ES_PASS);
         else
             return new ESService(process.env.ES_HOST, process.env.ES_USER, process.env.ES_PASS);
+    }
+    async createAFakeRecord() {
+        try {
+            //when first install, there is no queue, because of this there is some much error,
+            // this code createa a fake record
+            await this.logWatcher.write('////////');
+        } catch (err) {
+            logger.error(err);
+        }
     }
     protected parseWhy(val: number): string {
         return PolicyAuthzErrors[val];
@@ -96,6 +110,8 @@ export class SvcActivityLogParser {
 
         const session = await this.systemWatcher.getSession(tun?.sessionId || '');
         item.authSource = session?.source || 'unknown';
+        item.sessionId = session?.id;
+
 
     }
     async processData(datas: WatchItem<string>[]) {

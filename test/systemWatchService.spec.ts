@@ -1,6 +1,6 @@
 
 import chai from 'chai';
-import { ConfigService, RedisService, SessionService, TunnelService, User, Util } from 'rest.portal';
+import { ConfigService, RedisService, SessionService, SystemLogService, TunnelService, User, Util } from 'rest.portal';
 import { SystemWatchService } from '../src/systemWatchService';
 import { Leader } from '../src/leader';
 
@@ -40,7 +40,7 @@ describe('systemWatchService ', async () => {
         const session1 = await sessionService.createSession(user, true, '1.2.3.4', 'local');
         const session2 = await sessionService.createSession(user, true, '1.2.3.5', 'local');
         const session3 = await sessionService.createSession(user, true, '1.2.3.6', 'local');
-
+        const systemlog = new SystemLogService(simpleRedis, new RedisService());
         const tunnelService = new TunnelService(configService, simpleRedis);
 
         const tunnel1 = {
@@ -57,7 +57,7 @@ describe('systemWatchService ', async () => {
         }
         await simpleRedis.hset(`/tunnel/id/randomtunnelid2`, tunnel2)
 
-        const watch = new SystemWatchService(tunnelService, sessionService);
+        const watch = new SystemWatchService(tunnelService, sessionService, systemlog);
         await watch.loadAllSessions();
         const s1 = await watch.getSession(session1.id);
         expect(s1).exist;

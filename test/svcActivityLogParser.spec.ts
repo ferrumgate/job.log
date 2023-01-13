@@ -74,7 +74,7 @@ describe('svcActivityLogParser ', async () => {
         const config = new RedisConfigService(new RedisService(), new RedisService(), systemlog, encKey);
         await config.init();
         const { tunnelService, sessionService, user, session1, session2, session3, tunnel1, tunnel2 } = await prepareData(config);
-        const watch = new SystemWatchService(tunnelService, sessionService);
+        const watch = new SystemWatchService(tunnelService, sessionService, systemlog);
         await watch.start();
         await Util.sleep(1000);
 

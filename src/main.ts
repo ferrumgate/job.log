@@ -22,7 +22,7 @@ async function main() {
 
     await configService.start();
 
-    let systemWatchService = new SystemWatchService(new TunnelService(configService, redis), new SessionService(configService, redis));
+    let systemWatchService = new SystemWatchService(new TunnelService(configService, redis), new SessionService(configService, redis), systemlogService);
     await systemWatchService.start();
 
     const encKey = process.env.ENCRYPT_KEY || Util.randomNumberString(32);
@@ -38,7 +38,7 @@ async function main() {
 
 
     const leader = new Leader('job.log', redis, process.env.REDIS_HOST || 'localhost');
-    await leader.start();
+    //await leader.start();
 
     if (process.env.MODUE_ACTIVITY_TO_ES == 'true') {
         activity = new ActivityLogToES(redis, await createRedis(), leader);
@@ -50,7 +50,7 @@ async function main() {
     }
 
     if (process.env.MODULE_ACTIVITY_SVC_PARSER == 'true') {
-        svcParser = new SvcActivityLogParser(redis, await createRedis(), encKey, configService, systemWatchService)
+        svcParser = new SvcActivityLogParser(redis, await createRedis(), '', configService, systemWatchService)
         await svcParser.start();
     }
 

@@ -1,6 +1,6 @@
 import { SessionState } from "http2";
 import NodeCache from "node-cache";
-import { logger, SessionService, SystemLog, Tunnel, TunnelService, Util } from "rest.portal";
+import { logger, RedisConfigWatchCachedService, SessionService, SystemLog, SystemLogService, Tunnel, TunnelService, Util, WatchItem } from "rest.portal";
 import { AuthSession } from "rest.portal/model/authSession";
 const { setIntervalAsync, clearIntervalAsync } = require('set-interval-async');
 
@@ -15,8 +15,13 @@ export class SystemWatchService {
     protected allSessionsLoaded = false;
     protected waitList: SystemLog[] = [];
     constructor(
-        private tunnelService: TunnelService, private sessionService: SessionService
+        private tunnelService: TunnelService, private sessionService: SessionService, private systemLog: SystemLogService
     ) {
+        this.systemLog.logWatcher.events.on('data', async (data: WatchItem<SystemLog>) => {
+            if (data.val) {
+                this.waitList.push(data.val);
+            }
+        })
 
         this.tunnels = new NodeCache({
             stdTTL: 24 * 60 * 1000, useClones: false, checkperiod: 10 * 60 * 1000
@@ -88,7 +93,7 @@ export class SystemWatchService {
             logger.info(`system watcher getting sessions`);
 
             const allSessions = await this.sessionService.getAllValidSessions(() => !this.isStoping);
-            logger.info(`system watcher getted all sessoins count: ${allSessions.length}`);
+            logger.info(`system watcher getted all sessions count: ${allSessions.length}`);
             allSessions.forEach((x: AuthSession) => {
                 this.normalizeSession(x);
                 if (x.id) {
@@ -97,7 +102,7 @@ export class SystemWatchService {
             })
 
             this.allSessionsLoaded = true;
-            logger.info(`system watcher all tunnels getted count:${allSessions.length}`);
+            logger.info(`system watcher all sessions getted count:${allSessions.length}`);
 
         } catch (err) {
             logger.error(err);
@@ -109,7 +114,9 @@ export class SystemWatchService {
         try {
             if (!this.allTunnelsLoaded) return;
             while (this.waitList.length) {
+
                 const ev = this.waitList[0];
+                logger.debug(`system watcher data ${JSON.stringify(ev)}`)
                 if (ev.path == '/system/tunnels/confirm') {
                     const data = ev.val as Tunnel;
                     if (data?.id) {
