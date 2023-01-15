@@ -16,6 +16,7 @@ export class SvcActivityLogParser {
 
             "job.log", Util.randomNumberString(16),
             this.logs, "0", undefined, this.encKey, 1000, async (data: any[]) => {
+                logger.debug(`log parsed data received: ${data.length}`)
                 await this.processData(data);
             })
         this.es = this.createESService();
@@ -80,7 +81,8 @@ export class SvcActivityLogParser {
 
             }
         })
-        if (result.trackId) return result;
+        if (!Util.isUndefinedOrNull(result.trackId))
+            return result;
         return null;
 
     }
