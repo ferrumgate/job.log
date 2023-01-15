@@ -87,7 +87,7 @@ describe('svcActivityLogParser ', async () => {
         await Util.sleep(1000);
 
         const parser = new SvcActivityLogParser(new RedisService(), new RedisService(), encKey, redisConfig, watch);
-        const log = await parser.parse('/1000/2/1/3/1234/123456/12/someid/randomtunnelid/1.2.3.4/3456');
+        const log = await parser.parse(',1000,232323,1,1,2,1,3,1234,123456,12,someid,randomtunnelid,1.2.3.4,3456');
         expect(log).exist;
 
         if (log) {

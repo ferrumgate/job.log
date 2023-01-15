@@ -35,7 +35,7 @@ export class SvcActivityLogParser {
         try {
             //when first install, there is no queue, because of this there is some much error,
             // this code createa a fake record
-            await this.logWatcher.write('////////');
+            await this.logWatcher.write(',,,,,,,,,,,');
         } catch (err) {
             logger.error(err);
         }
@@ -44,34 +44,34 @@ export class SvcActivityLogParser {
         return PolicyAuthzErrors[val];
     }
     async parse(log: string) {
-        const parts = log.split('/');
+        const parts = log.split(',');
         let result: ActivityLog = { trackId: 0, requestId: Util.randomNumberString(16), type: 'service allow', authSource: '', status: 200, insertDate: new Date().toISOString(), ip: '' }
         parts.forEach((val, index) => {
             switch (index) {
                 case 1:
                     result.insertDate = new Date(Util.convertToNumber(val) / 1000).toISOString(); break;
-                case 2:
+                case 5:
                     result.trackId = Util.convertToNumber(val); break;
-                case 3:
+                case 6:
                     let isDropped = Util.convertToNumber(val);
                     if (isDropped) result.status = 401;
                     if (isDropped) result.type = 'service deny';
                     break;
-                case 4:
+                case 7:
                     let why = Util.convertToNumber(val);
                     result.statusMessage = this.parseWhy(why)?.toString() || '';
                     break;
-                case 5:
-                    result.gatewayId = val; break;
-                case 6:
-                    result.serviceId = val; break;
-                case 7:
-                    result.authzRuleId = val; break;
                 case 8:
-                    result.userId = val; break;
+                    result.gatewayId = val; break;
                 case 9:
-                    result.tunnelId = val; break;
+                    result.serviceId = val; break;
                 case 10:
+                    result.authzRuleId = val; break;
+                case 11:
+                    result.userId = val; break;
+                case 12:
+                    result.tunnelId = val; break;
+                case 13:
                     result.ip = val; break;
 
 

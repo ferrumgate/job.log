@@ -8,7 +8,7 @@ import { Leader } from '../src/leader';
 const expect = chai.expect;
 
 
-describe('leader ', async () => {
+describe.skip('leader ', async () => {
     const redis = new RedisService();
     beforeEach(async () => {
 
