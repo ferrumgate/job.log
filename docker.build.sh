@@ -11,6 +11,7 @@ docker tag job.log job.log:$version
 echo "job.log:$version builded"
 docker tag job.log registry.ferrumgate.local/ferrumgate/job.log:$version
 docker tag job.log registry.ferrumgate.local/ferrumgate/job.log:latest
+docker tag job.log ferrumgate/job.log:$version
 
 while true; do
     read -p "do you want push to local registry y/n " yn
