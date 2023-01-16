@@ -101,7 +101,7 @@ describe('svcActivityLogParser ', async () => {
             expect(log.authzRuleId).to.equal('12');
             expect(log.userId).to.equal('someid');
             expect(log.tunnelId).to.equal('randomtunnelid');
-            expect(log.ip).to.equal('1.2.3.4');
+            expect(log.assignedIp).to.equal('1.2.3.4');
         }
         if (log) {
             await parser.fillItem(log);
@@ -114,7 +114,7 @@ describe('svcActivityLogParser ', async () => {
             expect(log.user2FA).to.be.true;
             expect(log.tunType).to.equal('ssh');
             expect(log.tun).to.equal('tun0');
-            expect(log.assignedIp).to.equal('10.0.0.3');
+            expect(log.ip).to.equal(session1.ip);
             expect(log.is2FA).to.be.false;
             expect(log.authSource).to.equal('local');
 

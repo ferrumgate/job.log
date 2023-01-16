@@ -73,7 +73,7 @@ export class SvcActivityLogParser {
                 case 12:
                     result.tunnelId = val; break;
                 case 13:
-                    result.ip = val; break;
+                    result.assignedIp = val; break;
 
 
                 default: break;
@@ -114,6 +114,7 @@ export class SvcActivityLogParser {
         const session = await this.systemWatcher.getSession(tun?.sessionId || '');
         item.authSource = session?.source || 'unknown';
         item.sessionId = session?.id;
+        item.ip = session?.ip || '0.0.0.0';
 
 
     }

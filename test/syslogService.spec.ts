@@ -127,10 +127,10 @@ describe('syslogUdpService', () => {
     it('read/write', async () => {
 
         const log = '/logs/test';
-        const syslog = new SyslogUdpService(5555, new RedisService(), new RedisService(), log);
+        const syslog = new SyslogUdpService(5556, new RedisService(), new RedisService(), log);
         await syslog.start();
         const client = udp.createSocket('udp4');
-        client.send('hello', 5555);
+        client.send('hello', 5556);
         await Util.sleep(5000);
         const result = await simpleRedis.xread(log, 1000, '0', 100);
 
