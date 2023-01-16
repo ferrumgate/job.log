@@ -107,7 +107,8 @@ export class SvcActivityLogParser {
         const tun = await this.systemWatcher.getTunnel(item.tunnelId || '');
         item.tunType = tun?.type;
         item.tun = tun?.tun;
-        item.assignedIp = tun?.assignedClientIp;
+        if (!item.assignedIp && tun?.assignedClientIp)
+            item.assignedIp = tun?.assignedClientIp;
         item.is2FA = tun?.is2FA;
 
         const session = await this.systemWatcher.getSession(tun?.sessionId || '');
