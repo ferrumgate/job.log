@@ -2,6 +2,7 @@ import { SessionState } from "http2";
 import NodeCache from "node-cache";
 import { logger, RedisConfigWatchCachedService, SessionService, SystemLog, SystemLogService, Tunnel, TunnelService, Util, WatchItem } from "rest.portal";
 import { AuthSession } from "rest.portal/model/authSession";
+import { BroadcastService } from "./service/bcastService";
 const { setIntervalAsync, clearIntervalAsync } = require('set-interval-async');
 
 
@@ -15,9 +16,10 @@ export class SystemWatchService {
     protected allSessionsLoaded = false;
     protected waitList: SystemLog[] = [];
     constructor(
-        private tunnelService: TunnelService, private sessionService: SessionService, private systemLog: SystemLogService
+        private tunnelService: TunnelService, private sessionService: SessionService, private systemLog: SystemLogService,
+        private bcastService: BroadcastService
     ) {
-        this.systemLog.logWatcher.events.on('data', async (data: WatchItem<SystemLog>) => {
+        this.systemLog.watcher.events.on('data', async (data: WatchItem<SystemLog>) => {
             if (data.val) {
                 this.waitList.push(data.val);
             }
@@ -42,7 +44,7 @@ export class SystemWatchService {
         this.isStoping = false;
 
 
-        this.startTimer = await setIntervalAsync(async () => {
+        this.startTimer = setIntervalAsync(async () => {
             await this.loadAllTunnels();
             await this.loadAllSessions();
             await this.processEvents();
@@ -154,6 +156,7 @@ export class SystemWatchService {
                     }
                 }
                 this.waitList.shift();
+                this.bcastService.emit('systemLog', ev);
             }
 
         } catch (err) {

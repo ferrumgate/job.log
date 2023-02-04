@@ -34,7 +34,7 @@ export class Leader {
     }
 
     async start() {
-        this.timeInterval = await setIntervalAsync(async () => {
+        this.timeInterval = setIntervalAsync(async () => {
             await this.ping();
             await this.leaderElection();
         }, 15000);

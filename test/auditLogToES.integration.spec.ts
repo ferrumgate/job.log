@@ -4,6 +4,7 @@ import chai from 'chai';
 import { AuditLog, AuditService, ConfigService, ESService, RedisService, RedisWatcherService, Util } from 'rest.portal';
 import { Leader } from '../src/leader';
 import { AuditLogToES } from '../src/auditLogToES';
+import { ESServiceExtended } from '../src/service/esServiceExtended';
 
 
 
@@ -52,19 +53,20 @@ describe('auditLogToES ', async () => {
         return { log1, log2 };
     }
     it('saveToES', async () => {
+        const filename = `/tmp/${Util.randomNumberString()}config.yaml`;
+        const configService = new ConfigService('mn4xq0zeryusnagsdkbb2a68r7uu3nn25q4i91orj3ofkgb42d6nw5swqd7sz4fm', filename);
         class Mock extends AuditLogToES {
-            createESService(): ESService {
-                return new ESService(esHost, esUser, esPass)
+            override createESService(): ESService {
+                return new ESService(this.configService, esHost, esUser, esPass)
             }
         }
-        const filename = `/tmp/${Util.randomNumberString()}config.yaml`;
-        //first create a config and save to a file
-        let configService = new ConfigService('AuX165Jjz9VpeOMl3msHbNAncvDYezMg', filename);
+
 
         const redis = new RedisService();
         await redis.flushAll();
         const redis2 = new RedisService();
-        const es = new ESService(esHost, esUser, esPass);
+        const es = new ESService(configService, esHost, esUser, esPass);
+        await Util.sleep(1000);
 
         const { log1, log2 } = createSampleData();
 
@@ -75,7 +77,7 @@ describe('auditLogToES ', async () => {
         await es.reset();
         const watcher = new Leader('redis', redis, 'localhost');
         watcher.isMe = true;//no need anymore
-        const auditLog = new Mock(configService.getEncKey(), redis, redis2, watcher);
+        const auditLog = new Mock(configService.getEncKey(), redis, redis2, watcher, configService);
         await auditLog.start();
         await Util.sleep(15000);
         await auditLog.stop();

@@ -111,14 +111,14 @@ describe.skip('leader ', async () => {
 
         }, 100000);
 
-        await Util.sleep(120000);
+        await Util.sleep(100000);
         expect(leader.isMe).to.be.true;
         expect(leader2.isMe).to.be.false;
 
         await leader.stop();
         expect(leader.isMe).to.be.false;
 
-        await Util.sleep(90000);
+        await Util.sleep(120000);
 
         expect(leader.isMe).to.be.false;
         expect(leader2.isMe).to.be.true;

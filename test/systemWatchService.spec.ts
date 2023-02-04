@@ -3,6 +3,7 @@ import chai from 'chai';
 import { ConfigService, RedisService, SessionService, SystemLogService, TunnelService, User, Util } from 'rest.portal';
 import { SystemWatchService } from '../src/systemWatchService';
 import { Leader } from '../src/leader';
+import { BroadcastService } from '../src/service/bcastService';
 
 const expect = chai.expect;
 
@@ -57,7 +58,7 @@ describe('systemWatchService ', async () => {
         }
         await simpleRedis.hset(`/tunnel/id/randomtunnelid2`, tunnel2)
 
-        const watch = new SystemWatchService(tunnelService, sessionService, systemlog);
+        const watch = new SystemWatchService(tunnelService, sessionService, systemlog, new BroadcastService());
         await watch.loadAllSessions();
         const s1 = await watch.getSession(session1.id);
         expect(s1).exist;
