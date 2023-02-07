@@ -28,7 +28,7 @@ export class ESDeleteOldLogs {
         this.interval = setIntervalAsync(async () => {
             await this.deleteOldLogs();
         },
-            process.env.NODE == 'development' ? 5 : 60 * 1000);
+            process.env.NODE == 'development' ? 5 : 6 * 60 * 60 * 1000);
     }
     async stop() {
         if (this.interval)
