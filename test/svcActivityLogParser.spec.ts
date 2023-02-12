@@ -5,6 +5,7 @@ import { SystemWatchService } from '../src/systemWatchService';
 import { Leader } from '../src/leader';
 import { SvcActivityLogParser } from '../src/svcActivityLogParser';
 import { BroadcastService } from '../src/service/bcastService';
+import { DhcpService } from 'rest.portal/service/dhcpService';
 
 
 
@@ -50,7 +51,7 @@ describe('svcActivityLogParser ', async () => {
         const session2 = await sessionService.createSession(user, true, '1.2.3.5', 'local');
         const session3 = await sessionService.createSession(user, true, '1.2.3.6', 'local');
 
-        const tunnelService = new TunnelService(config, simpleRedis);
+        const tunnelService = new TunnelService(config, simpleRedis, new DhcpService(config, simpleRedis));
 
         const tunnel1 = {
             id: 'randomtunnelid', userId: 100, authenticatedTime: new Date().toString(),
@@ -88,7 +89,7 @@ describe('svcActivityLogParser ', async () => {
         await Util.sleep(1000);
 
         const parser = new SvcActivityLogParser(new RedisService(), new RedisService(), encKey, redisConfig, watch);
-        const log = await parser.parse(',1000,232323,1,1,2,1,3,1234,123456,12,someid,randomtunnelid,1.2.3.4,3456');
+        const log = await parser.parse(',1000,232323,1,1,2,1,3,1234,123456,12,someid,randomtunnelid,1.2.3.4,3456,tcp,2.3.4.5,89');
         expect(log).exist;
 
         if (log) {
@@ -102,7 +103,11 @@ describe('svcActivityLogParser ', async () => {
             expect(log.authzRuleId).to.equal('12');
             expect(log.userId).to.equal('someid');
             expect(log.tunnelId).to.equal('randomtunnelid');
-            expect(log.assignedIp).to.equal('1.2.3.4');
+            expect(log.sourceIp).to.equal('1.2.3.4');
+            expect(log.sourcePort).to.equal(3456);
+            expect(log.networkProtocol).to.equal('tcp');
+            expect(log.destinationIp).to.equal('2.3.4.5');
+            expect(log.destinationPort).to.equal(89);
         }
         if (log) {
             await parser.fillItem(log);
@@ -118,6 +123,7 @@ describe('svcActivityLogParser ', async () => {
             expect(log.ip).to.equal(session1.ip);
             expect(log.is2FA).to.be.false;
             expect(log.authSource).to.equal('local');
+            expect(log.assignedIp).to.equal('10.0.0.3')
 
         }
 

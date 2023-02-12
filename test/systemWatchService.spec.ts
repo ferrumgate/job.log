@@ -4,6 +4,7 @@ import { ConfigService, RedisService, SessionService, SystemLogService, TunnelSe
 import { SystemWatchService } from '../src/systemWatchService';
 import { Leader } from '../src/leader';
 import { BroadcastService } from '../src/service/bcastService';
+import { DhcpService } from 'rest.portal/service/dhcpService';
 
 const expect = chai.expect;
 
@@ -42,7 +43,7 @@ describe('systemWatchService ', async () => {
         const session2 = await sessionService.createSession(user, true, '1.2.3.5', 'local');
         const session3 = await sessionService.createSession(user, true, '1.2.3.6', 'local');
         const systemlog = new SystemLogService(simpleRedis, new RedisService());
-        const tunnelService = new TunnelService(configService, simpleRedis);
+        const tunnelService = new TunnelService(configService, simpleRedis, new DhcpService(configService, simpleRedis));
 
         const tunnel1 = {
             id: 'randomtunnelid', userId: 100, authenticatedTime: new Date().toString(),

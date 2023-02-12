@@ -74,7 +74,16 @@ export class SvcActivityLogParser {
                 case 12:
                     result.tunnelId = val; break;
                 case 13:
-                    result.assignedIp = val; break;
+                    result.sourceIp = val; break;
+                case 14:
+                    result.sourcePort = Util.convertToNumber(val); break;
+                case 15:
+                    result.networkProtocol = val; break;
+                case 16:
+                    result.destinationIp = val; break;
+                case 17:
+                    result.destinationPort = Util.convertToNumber(val); break;
+
 
 
                 default: break;

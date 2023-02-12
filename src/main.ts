@@ -7,6 +7,7 @@ import { SvcActivityLogParser } from "./svcActivityLogParser";
 import { SyslogService, SyslogUdpService } from "./syslogService";
 import { SystemWatchService } from "./systemWatchService";
 import { ESDeleteOldLogs } from "./esDeleteOldLogs";
+import { DhcpService } from "rest.portal/service/dhcpService";
 
 async function createRedis() {
     return new RedisService(process.env.REDIS_HOST, process.env.REDIS_PASS);
@@ -25,7 +26,7 @@ async function main() {
     await configService.start();
     const bcastService = new BroadcastService();
 
-    let systemWatchService = new SystemWatchService(new TunnelService(configService, redis), new SessionService(configService, redis), systemlogService, bcastService);
+    let systemWatchService = new SystemWatchService(new TunnelService(configService, redis, new DhcpService(configService, redis)), new SessionService(configService, redis), systemlogService, bcastService);
     await systemWatchService.start();
 
     const encKey = process.env.ENCRYPT_KEY || Util.randomNumberString(32);
@@ -43,7 +44,7 @@ async function main() {
     const leader = new Leader('job.log', redis, process.env.REDIS_HOST || 'localhost');
     //await leader.start();
 
-    if (process.env.MODUE_ACTIVITY_TO_ES == 'true') {
+    if (process.env.MODULE_ACTIVITY_TO_ES == 'true') {
         activity = new ActivityLogToES(redis, await createRedis(), leader, configService);
         await activity.start();
     }
