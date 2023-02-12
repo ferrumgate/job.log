@@ -1,4 +1,7 @@
+import { createSecretKey } from "crypto";
 import { ActivityLog, ConfigService, ESService, ESServiceLimited, logger, RedisService, RedisWatcherService, Util, WatchGroupService, WatchItem } from "rest.portal";
+import { ConfigWatch } from "rest.portal/model/config";
+import { ESServiceExtended, ESServiceLimitedExtended } from "./service/esServiceExtended";
 import { Leader } from "./leader";
 
 
@@ -15,10 +18,12 @@ export class ActivityLogToES {
     lastPos = '';
     timer: any;
     activityStreamKey = '/logs/activity';
-    es: ESService;
+    es!: ESService;
     watchGroup: WatchGroupService;
-    constructor(private redis: RedisService, private redisStream: RedisService,
-        private leader: Leader) {
+    interval: any;
+
+    constructor(protected redis: RedisService, protected redisStream: RedisService,
+        protected leader: Leader, protected configService: ConfigService) {
         this.watchGroup = new WatchGroupService(this.redis, this.redisStream, "job.log",
             Util.randomNumberString(16),
             this.activityStreamKey, '0', 12 * 60 * 60 * 1000, '', 10000, async (data: any[]) => {
@@ -27,11 +32,17 @@ export class ActivityLogToES {
         this.es = this.createESService();
 
     }
-    createESService() {
+
+
+
+
+
+    createESService(): ESService {
+
         if (process.env.LIMITED_MODE == 'true')
-            return new ESServiceLimited(process.env.ES_HOST, process.env.ES_USER, process.env.ES_PASS);
+            return new ESServiceLimitedExtended(this.configService);
         else
-            return new ESService(process.env.ES_HOST, process.env.ES_USER, process.env.ES_PASS);
+            return new ESServiceExtended(this.configService);
     }
 
 

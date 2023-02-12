@@ -1,5 +1,6 @@
-import { ESService, ESServiceLimited, logger, RedisService, RedisWatcherService, Util, WatchGroupService, WatchItem } from "rest.portal";
+import { ConfigService, ESService, ESServiceLimited, logger, RedisService, RedisWatcherService, Util, WatchGroupService, WatchItem } from "rest.portal";
 import { AuditLog } from "rest.portal/model/auditLog";
+import { ESServiceExtended, ESServiceLimitedExtended } from "./service/esServiceExtended";
 import { Leader } from "./leader";
 
 const { setIntervalAsync, clearIntervalAsync } = require('set-interval-async');
@@ -16,19 +17,20 @@ export class AuditLogToES {
     auditStreamKey = '/logs/audit';
     es: ESService;
     watchGroup: WatchGroupService;
-    constructor(encKey: string, private redis: RedisService, private redisStream: RedisService,
-        private leader: Leader) {
+    constructor(encKey: string, protected redis: RedisService, protected redisStream: RedisService,
+        protected leader: Leader, protected configService: ConfigService) {
         this.watchGroup = new WatchGroupService(this.redis, this.redisStream, "job.log", Util.randomNumberString(16), this.auditStreamKey, '0', 24 * 60 * 60 * 1000, encKey, 10000, async (data: any[]) => {
             await this.processData(data);
         })
         this.es = this.createESService();
 
     }
-    createESService() {
+    createESService(): ESService {
+
         if (process.env.LIMITED_MODE == 'true')
-            return new ESServiceLimited(process.env.ES_HOST, process.env.ES_USER, process.env.ES_PASS);
+            return new ESServiceLimitedExtended(this.configService);
         else
-            return new ESService(process.env.ES_HOST, process.env.ES_USER, process.env.ES_PASS);
+            return new ESServiceExtended(this.configService);
     }
 
 

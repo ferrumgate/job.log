@@ -1,9 +1,10 @@
 
-import chai from 'chai';
+import chai, { util } from 'chai';
 
 import { ActivityLog, ActivityService, ConfigService, ESService, RedisService, RedisWatcherService, Util } from 'rest.portal';
 import { Leader } from '../src/leader';
 import { ActivityLogToES } from '../src/activityLogToES';
+import { ESServiceExtended } from '../src/service/esServiceExtended';
 
 
 
@@ -14,6 +15,7 @@ const esHost = 'https://192.168.88.250:9200';
 const esUser = "elastic";
 const esPass = '123456';
 describe('activityLogToES ', async () => {
+
 
     beforeEach(async () => {
 
@@ -42,18 +44,23 @@ describe('activityLogToES ', async () => {
         return { log1, log2 };
     }
     it('saveToES', async () => {
+        const filename = `/tmp/${Util.randomNumberString()}config.yaml`;
+        const configService = new ConfigService('mn4xq0zeryusnagsdkbb2a68r7uu3nn25q4i91orj3ofkgb42d6nw5swqd7sz4fm', filename);
         class Mock extends ActivityLogToES {
-            createESService(): ESService {
-                return new ESService(esHost, esUser, esPass)
+
+            override createESService(): ESService {
+                return new ESService(this.configService, esHost, esUser, esPass)
             }
         }
-        const filename = `/tmp/${Util.randomNumberString()}config.yaml`;
+
         //first create a config and save to a file
         //let configService = new ConfigService('AuX165Jjz9VpeOMl3msHbNAncvDYezMg', filename);
         const redis = new RedisService();
         await redis.flushAll();
         const redis2 = new RedisService();
-        const es = new ESService(esHost, esUser, esPass);
+        const es = new ESService(configService, esHost, esUser, esPass);
+        await Util.sleep(1000);
+
         const { log1, log2 } = createSampleData();
 
         const activityService = new ActivityService(redis, es);
@@ -63,7 +70,7 @@ describe('activityLogToES ', async () => {
         await es.reset();
         const watcher = new Leader('redis', redis, 'localhost');
         //watcher.isMe = true;
-        const activityLog = new Mock(redis, redis2, watcher);
+        const activityLog = new Mock(redis, redis2, watcher, configService);
         await activityLog.start();
         await Util.sleep(15000);
         await activityLog.stop();

@@ -1,5 +1,6 @@
 import { ActivityLog, ESService, ESServiceLimited, logger, RedisCachedConfigService, RedisConfigWatchCachedService, RedisConfigWatchService, RedisService, Util, WatchGroupService, WatchItem, WatchService } from "rest.portal";
 import { PolicyAuthzErrors } from "rest.portal/service/policyService";
+import { ESServiceExtended, ESServiceLimitedExtended } from "./service/esServiceExtended";
 import { SystemWatchService } from "./systemWatchService";
 
 
@@ -28,9 +29,9 @@ export class SvcActivityLogParser {
     }
     protected createESService() {
         if (process.env.LIMITED_MODE == 'true')
-            return new ESServiceLimited(process.env.ES_HOST, process.env.ES_USER, process.env.ES_PASS);
+            return new ESServiceLimitedExtended(this.configService, process.env.ES_HOST, process.env.ES_USER, process.env.ES_PASS);
         else
-            return new ESService(process.env.ES_HOST, process.env.ES_USER, process.env.ES_PASS);
+            return new ESServiceExtended(this.configService, process.env.ES_HOST, process.env.ES_USER, process.env.ES_PASS);
     }
     async createAFakeRecord() {
         try {
@@ -73,7 +74,16 @@ export class SvcActivityLogParser {
                 case 12:
                     result.tunnelId = val; break;
                 case 13:
-                    result.assignedIp = val; break;
+                    result.sourceIp = val; break;
+                case 14:
+                    result.sourcePort = Util.convertToNumber(val); break;
+                case 15:
+                    result.networkProtocol = val; break;
+                case 16:
+                    result.destinationIp = val; break;
+                case 17:
+                    result.destinationPort = Util.convertToNumber(val); break;
+
 
 
                 default: break;

@@ -1,10 +1,10 @@
-FROM node:18.12.1-bullseye-slim
+FROM node:18.13.0-bullseye-slim
 RUN apt update &&\
     apt install --assume-yes --no-install-recommends openssl \
     ca-certificates gnupg iputils-ping
 #Create app directory
 WORKDIR /usr/src/app
-
+RUN sed -i 's/providers = provider_sect/#providers = provider_sect/g' /etc/ssl/openssl.cnf
 
 
 ADD node_modules/rest.portal2 /usr/src/rest.portal/build/src

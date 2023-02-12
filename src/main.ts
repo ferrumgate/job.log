@@ -1,10 +1,13 @@
 import { AuditLog, logger, RedisConfigWatchCachedService, RedisService, SessionService, SystemLogService, TunnelService, Util } from "rest.portal"
 import { ActivityLogToES } from "./activityLogToES";
 import { AuditLogToES } from "./auditLogToES";
+import { BroadcastService } from "./service/bcastService";
 import { Leader } from "./leader";
 import { SvcActivityLogParser } from "./svcActivityLogParser";
 import { SyslogService, SyslogUdpService } from "./syslogService";
 import { SystemWatchService } from "./systemWatchService";
+import { ESDeleteOldLogs } from "./esDeleteOldLogs";
+import { DhcpService } from "rest.portal/service/dhcpService";
 
 async function createRedis() {
     return new RedisService(process.env.REDIS_HOST, process.env.REDIS_PASS);
@@ -16,13 +19,14 @@ async function main() {
     //const syslog = new SyslogService(sockPath, await createRedis(), await createRedis(), '/logs/activity/svc');
     //await syslog.start();
     const redis = await createRedis();
-    let systemlogService: SystemLogService = new SystemLogService(redis, await createRedis(), process.env.ENCRYPT_KEY || '')
+    let systemlogService: SystemLogService = new SystemLogService(redis, await createRedis(), process.env.ENCRYPT_KEY || '');
     let configService: RedisConfigWatchCachedService =
         new RedisConfigWatchCachedService(redis, await createRedis(), systemlogService, true, process.env.ENCRYPT_KEY || '');
 
     await configService.start();
+    const bcastService = new BroadcastService();
 
-    let systemWatchService = new SystemWatchService(new TunnelService(configService, redis), new SessionService(configService, redis), systemlogService);
+    let systemWatchService = new SystemWatchService(new TunnelService(configService, redis, new DhcpService(configService, redis)), new SessionService(configService, redis), systemlogService, bcastService);
     await systemWatchService.start();
 
     const encKey = process.env.ENCRYPT_KEY || Util.randomNumberString(32);
@@ -40,12 +44,12 @@ async function main() {
     const leader = new Leader('job.log', redis, process.env.REDIS_HOST || 'localhost');
     //await leader.start();
 
-    if (process.env.MODUE_ACTIVITY_TO_ES == 'true') {
-        activity = new ActivityLogToES(redis, await createRedis(), leader);
+    if (process.env.MODULE_ACTIVITY_TO_ES == 'true') {
+        activity = new ActivityLogToES(redis, await createRedis(), leader, configService);
         await activity.start();
     }
     if (process.env.MODULE_AUDIT_TO_ES == 'true') {
-        audit = new AuditLogToES(encKey, redis, await createRedis(), leader)
+        audit = new AuditLogToES(encKey, redis, await createRedis(), leader, configService)
         await audit.start();
     }
 
@@ -54,6 +58,8 @@ async function main() {
         await svcParser.start();
     }
 
+    const deleteOldEsLogs = new ESDeleteOldLogs(configService);
+    await deleteOldEsLogs.start();
 
 
     process.on('SIGINT', async () => {
@@ -65,6 +71,7 @@ async function main() {
         await systemWatchService.stop();
         await configService.stop();
         await svcParser?.stop();
+        await deleteOldEsLogs?.stop();
         logger.warn("sigint catched");
         process.exit(0);
 
@@ -78,6 +85,7 @@ async function main() {
         await systemWatchService.stop();
         await configService.stop();
         await svcParser?.stop();
+        await deleteOldEsLogs?.stop();
         logger.warn("sigterm catched");
         process.exit(0);
 
