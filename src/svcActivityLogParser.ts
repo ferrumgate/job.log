@@ -125,6 +125,12 @@ export class SvcActivityLogParser {
         item.authSource = session?.source || 'unknown';
         item.sessionId = session?.id;
         item.ip = session?.ip || '0.0.0.0';
+        //ip intelligence
+        item.countryCode = session?.countryCode;
+        item.countryName = session?.countryName;
+        item.isProxyIp = session?.isProxyIp;
+        item.isCrawlerIp = session?.isCrawlerIp;
+        item.isHostingIp = session?.isHostingIp;
 
 
     }
