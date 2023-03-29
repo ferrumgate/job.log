@@ -2,7 +2,7 @@ import { SessionState } from "http2";
 import NodeCache from "node-cache";
 import { logger, RedisConfigWatchCachedService, SessionService, SystemLog, SystemLogService, Tunnel, TunnelService, Util, WatchItem } from "rest.portal";
 import { AuthSession } from "rest.portal/model/authSession";
-import { BroadcastService } from "./service/bcastService";
+import { BroadcastService } from "rest.portal/service/broadcastService";
 const { setIntervalAsync, clearIntervalAsync } = require('set-interval-async');
 
 

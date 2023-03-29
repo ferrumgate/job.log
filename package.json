@@ -30,6 +30,7 @@
     "decompress-targz": "^4.1.1",
     "highwayhash": "^3.1.1",
     "md5-file": "^5.0.0",
+    "merge-files": "^0.1.2",
     "moment-timezone": "^0.5.41",
     "n-readlines": "^1.0.1",
     "node-cache": "^5.1.2",

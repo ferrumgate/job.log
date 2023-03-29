@@ -4,8 +4,8 @@ import { ConfigService, Gateway, Network, RedisConfigService, RedisConfigWatchCa
 import { SystemWatchService } from '../src/systemWatchService';
 import { Leader } from '../src/leader';
 import { SvcActivityLogParser } from '../src/svcActivityLogParser';
-import { BroadcastService } from '../src/service/bcastService';
 import { DhcpService } from 'rest.portal/service/dhcpService';
+import { BroadcastService } from 'rest.portal/service/broadcastService';
 
 
 
@@ -89,7 +89,7 @@ describe('svcActivityLogParser ', async () => {
         await Util.sleep(1000);
 
         const parser = new SvcActivityLogParser(new RedisService(), new RedisService(), encKey, redisConfig, watch);
-        const log = await parser.parse(',1000,232323,1,1,2,1,3,1234,123456,12,someid,randomtunnelid,1.2.3.4,3456,tcp,2.3.4.5,89');
+        const log = await parser.parse(',1000,232323,1,1,1000,2,1,3,1234,123456,12,someid,randomtunnelid,1.2.3.4,3456,tcp,2.3.4.5,89');
         expect(log).exist;
 
         if (log) {
