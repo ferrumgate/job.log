@@ -1,6 +1,6 @@
 {
   "name": "job.log",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "manages system logs",
   "main": "main.js",
   "scripts": {
@@ -10,11 +10,14 @@
     "start": "tsc && NODE_ENV=development  node ./build/src/main.js",
     "startdocker": "node ./build/src/main.js",
     "startprod": "REDIS_HOST=localhost node ./src/main.js",
-    "link": "npm link rest.portal@1.3.0 --save"
+    "link": "npm link rest.portal@1.5.0 --save"
   },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@gitlab.com/ferrumgate/job.log.git"
+  },
+  "publishConfig": {
+    "tag": "rest.portal@1.5.0"
   },
   "author": "",
   "license": "ISC",
@@ -23,13 +26,21 @@
   },
   "homepage": "https://gitlab.com/ferrumgate/job.log#readme",
   "dependencies": {
+    "decompress": "^4.2.1",
+    "decompress-targz": "^4.1.1",
+    "highwayhash": "^3.1.1",
+    "md5-file": "^5.0.0",
+    "merge-files": "^0.1.2",
     "moment-timezone": "^0.5.41",
+    "n-readlines": "^1.0.1",
     "node-cache": "^5.1.2",
+    "recursive-readdir": "^2.2.3",
     "rest.portal": "file:../rest.portal/build/src",
     "set-interval-async": "^3.0.2"
   },
   "devDependencies": {
     "@types/chai": "^4.3.4",
+    "@types/decompress": "^4.2.4",
     "@types/ioredis": "^4.28.10",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.11.18",

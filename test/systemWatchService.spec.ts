@@ -3,8 +3,8 @@ import chai from 'chai';
 import { ConfigService, RedisService, SessionService, SystemLogService, TunnelService, User, Util } from 'rest.portal';
 import { SystemWatchService } from '../src/systemWatchService';
 import { Leader } from '../src/leader';
-import { BroadcastService } from '../src/service/bcastService';
 import { DhcpService } from 'rest.portal/service/dhcpService';
+import { BroadcastService } from 'rest.portal/service/broadcastService';
 
 const expect = chai.expect;
 

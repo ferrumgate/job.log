@@ -1,6 +1,7 @@
-import { ActivityLog, ESService, ESServiceLimited, logger, RedisCachedConfigService, RedisConfigWatchCachedService, RedisConfigWatchService, RedisService, Util, WatchGroupService, WatchItem, WatchService } from "rest.portal";
+import { ActivityLog, ESService, ESServiceExtended, ESServiceLimited, logger, RedisCachedConfigService, RedisConfigWatchCachedService, RedisConfigWatchService, RedisService, Util, WatchGroupService, WatchItem, WatchService } from "rest.portal";
+import { BroadcastService } from "rest.portal/service/broadcastService";
 import { PolicyAuthzErrors } from "rest.portal/service/policyService";
-import { ESServiceExtended, ESServiceLimitedExtended } from "./service/esServiceExtended";
+import { ESServiceLimitedExtended } from "./service/esServiceExtended";
 import { SystemWatchService } from "./systemWatchService";
 
 

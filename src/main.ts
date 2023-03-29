@@ -1,13 +1,13 @@
 import { AuditLog, logger, RedisConfigWatchCachedService, RedisService, SessionService, SystemLogService, TunnelService, Util } from "rest.portal"
 import { ActivityLogToES } from "./activityLogToES";
 import { AuditLogToES } from "./auditLogToES";
-import { BroadcastService } from "./service/bcastService";
 import { Leader } from "./leader";
 import { SvcActivityLogParser } from "./svcActivityLogParser";
 import { SyslogService, SyslogUdpService } from "./syslogService";
 import { SystemWatchService } from "./systemWatchService";
 import { ESDeleteOldLogs } from "./esDeleteOldLogs";
 import { DhcpService } from "rest.portal/service/dhcpService";
+import { BroadcastService } from "rest.portal/service/broadcastService";
 
 async function createRedis() {
     return new RedisService(process.env.REDIS_HOST, process.env.REDIS_PASS);

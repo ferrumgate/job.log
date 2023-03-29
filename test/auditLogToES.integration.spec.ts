@@ -4,7 +4,8 @@ import chai from 'chai';
 import { AuditLog, AuditService, ConfigService, ESService, RedisService, RedisWatcherService, Util } from 'rest.portal';
 import { Leader } from '../src/leader';
 import { AuditLogToES } from '../src/auditLogToES';
-import { ESServiceExtended } from '../src/service/esServiceExtended';
+import { BroadcastService } from 'rest.portal/service/broadcastService';
+
 
 
 

@@ -1,7 +1,8 @@
-import { ConfigService, ESService, ESServiceLimited, logger, RedisService, RedisWatcherService, Util, WatchGroupService, WatchItem } from "rest.portal";
+import { ConfigService, ESService, ESServiceExtended, ESServiceLimited, logger, RedisService, RedisWatcherService, Util, WatchGroupService, WatchItem } from "rest.portal";
 import { AuditLog } from "rest.portal/model/auditLog";
-import { ESServiceExtended, ESServiceLimitedExtended } from "./service/esServiceExtended";
+import { ESServiceLimitedExtended } from "./service/esServiceExtended";
 import { Leader } from "./leader";
+import { BroadcastService } from "rest.portal/service/broadcastService";
 
 const { setIntervalAsync, clearIntervalAsync } = require('set-interval-async');
 
