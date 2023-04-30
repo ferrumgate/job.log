@@ -23,7 +23,7 @@ describe('activityLogToES ', async () => {
 
     })
 
-    const streamKey = '/logs/audit';
+
     function createSampleData() {
         const log1: ActivityLog = {
             insertDate: new Date().toISOString(),
