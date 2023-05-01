@@ -8,6 +8,7 @@ import { SystemWatchService } from "./systemWatchService";
 import { ESDeleteOldLogs } from "./esDeleteOldLogs";
 import { DhcpService } from "rest.portal/service/dhcpService";
 import { BroadcastService } from "rest.portal/service/broadcastService";
+import { DeviceLogToES } from "./deviceLogToES";
 
 async function createRedis() {
     return new RedisService(process.env.REDIS_HOST, process.env.REDIS_PASS);
@@ -31,6 +32,7 @@ async function main() {
 
     const encKey = process.env.ENCRYPT_KEY || Util.randomNumberString(32);
     let activity: ActivityLogToES;
+    let device: DeviceLogToES;
     let audit: AuditLogToES;
     let syslog: SyslogUdpService;
     let svcParser: SvcActivityLogParser;
@@ -48,6 +50,11 @@ async function main() {
         activity = new ActivityLogToES(redis, await createRedis(), leader, configService);
         await activity.start();
     }
+    if (process.env.MODULE_DEVICE_TO_ES == 'true') {
+        device = new DeviceLogToES(redis, await createRedis(), leader, configService);
+        await device.start();
+    }
+
     if (process.env.MODULE_AUDIT_TO_ES == 'true') {
         audit = new AuditLogToES(encKey, redis, await createRedis(), leader, configService)
         await audit.start();
@@ -65,6 +72,7 @@ async function main() {
     process.on('SIGINT', async () => {
         logger.warn("sigint catched");
         await activity?.stop();
+        await device?.stop();
         await audit?.stop();
         await leader.stop();
         await syslog?.stop();
@@ -79,6 +87,7 @@ async function main() {
     process.on('SIGTERM', async () => {
         logger.warn("sigterm catched");
         await activity?.stop();
+        await device?.stop();
         await audit?.stop();
         await leader.stop();
         await syslog?.stop();
