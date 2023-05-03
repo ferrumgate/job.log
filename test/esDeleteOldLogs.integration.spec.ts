@@ -1,13 +1,14 @@
 
 import chai from 'chai';
 
-import { ActivityLog, AuditLog, AuditService, ConfigService, ESService, RedisService, RedisWatcherService, Util } from 'rest.portal';
+import { ActivityLog, AuditLog, AuditService, ConfigService, DeviceLog, ESService, RedisService, RedisWatcherService, Util } from 'rest.portal';
 import { Leader } from '../src/leader';
 import { AuditLogToES } from '../src/auditLogToES';
 
 import { ActivityLogToES } from '../src/activityLogToES';
 import { ESDeleteOldLogs } from '../src/esDeleteOldLogs';
 import { BroadcastService } from 'rest.portal/service/broadcastService';
+import { DeviceLogToES } from '../src/deviceLogToES';
 
 
 
@@ -70,9 +71,84 @@ describe('esDeleteOldLogs ', async () => {
         expect(indexes.length == 2).to.be.true;
         const deleteOldLogs = new ESDeleteOldLogs(configService);
         await Util.sleep(2000);
-        await deleteOldLogs.deleteOldLogs();
+        await deleteOldLogs.deleteOldLogs('ferrumgate-activity-');
         await Util.sleep(2000);
         const indexes2 = (await es.getAllIndexes()).filter(x => x.includes('activity'));;
+        console.log(indexes);
+        console.log(indexes2);
+        expect(indexes.length - indexes2.length).to.equal(1);
+
+
+    }).timeout(200000);
+
+
+    const streamKey2 = '/logs/device';
+    function createSampleData2() {
+        let log1: DeviceLog = {
+            insertDate: new Date(1900, 1, 1).toISOString(),
+            clientSha256: '',
+            clientVersion: 'adfa',
+            hasAntivirus: true,
+            hasEncryptedDisc: false,
+            hasFirewall: true,
+            hostname: 'ferr',
+            id: '123',
+            isHealthy: true,
+            macs: 'ops',
+            osName: 'ad',
+            osVersion: 'adfa',
+            platform: 'win32',
+            serial: 'asdfaf',
+            userId: 'asdfafa',
+            username: 'adfasdfawe',
+
+
+        }
+
+        let log2: DeviceLog = {
+            insertDate: new Date().toISOString(),
+            clientSha256: '',
+            clientVersion: 'adfa',
+            hasAntivirus: true,
+            hasEncryptedDisc: false,
+            hasFirewall: true,
+            hostname: 'adaferr',
+            id: 'a123',
+            isHealthy: false,
+            macs: 'aops',
+            osName: 'aad',
+            osVersion: 'aewdfa',
+            platform: 'linx',
+            serial: 'asdfaf',
+            userId: 'asdfafa',
+            username: 'adfasdfawe',
+        }
+        return { log1, log2 };
+    }
+
+    it('saveToES and delete old records device', async () => {
+        const filename = `/tmp/${Util.randomNumberString()}config.yaml`;
+        const configService = new ConfigService('mn4xq0zeryusnagsdkbb2a68r7uu3nn25q4i91orj3ofkgb42d6nw5swqd7sz4fm', filename);
+        await configService.setES({ host: esHost, user: esUser, pass: esPass });
+
+        const es = new ESService(configService, esHost, esUser, esPass);
+        await Util.sleep(1000);
+        await es.reset();
+        const { log1, log2 } = createSampleData2();
+
+        const watcher = new Leader('redis', redis, 'localhost');
+        watcher.isMe = true;//no need anymore
+        const deviceLog = new DeviceLogToES(redis, redis, watcher, configService);
+        await Util.sleep(2000);
+        await deviceLog.processData([{ val: log1, time: 1 }, { val: log2, time: 2 }]);
+        await Util.sleep(15000);
+        const indexes = (await es.getAllIndexes()).filter(x => x.includes('device'));
+        expect(indexes.length == 2).to.be.true;
+        const deleteOldLogs = new ESDeleteOldLogs(configService);
+        await Util.sleep(2000);
+        await deleteOldLogs.deleteOldLogs('ferrumgate-device-');
+        await Util.sleep(2000);
+        const indexes2 = (await es.getAllIndexes()).filter(x => x.includes('device'));;
         console.log(indexes);
         console.log(indexes2);
         expect(indexes.length - indexes2.length).to.equal(1);

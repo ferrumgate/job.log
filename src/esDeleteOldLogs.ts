@@ -27,7 +27,8 @@ export class ESDeleteOldLogs {
 
     async start() {
         this.interval = setIntervalAsync(async () => {
-            await this.deleteOldLogs();
+            await this.deleteOldLogs('ferrumgate-activity-');
+            await this.deleteOldLogs('ferrumgate-device-');
         },
             process.env.NODE == 'development' ? 5 : 6 * 60 * 60 * 1000);
     }
@@ -35,21 +36,21 @@ export class ESDeleteOldLogs {
         if (this.interval)
             clearIntervalAsync(this.interval);
     }
-    async deleteOldLogs() {
+    async deleteOldLogs(indexSearch: string) {
         try {
 
             const oldDays = (await this.configService.getES()).deleteOldRecordsMaxDays || 7;
-            logger.info(`deleting old elastic search logs max days:${oldDays}`);
+            logger.info(`deleting old elastic search logs max days:${oldDays} index:${indexSearch}`);
             const indexes = await this.es.getAllIndexes();
-            const activityIndexes = indexes.filter(x => x.startsWith('ferrumgate-activity-'));
+            const activityIndexes = indexes.filter(x => x.startsWith(indexSearch));
             const datesAsString = activityIndexes.map(x => {
                 return { index: x, val: 0 }
             });
             const datesAsMiliseconds = datesAsString.map(x => {
                 try {
-                    const year = Number(x.index.replace('ferrumgate-activity-', '').substring(0, 4));
-                    const month = Number(x.index.replace('ferrumgate-activity-', '').substring(4, 2));
-                    const day = Number(x.index.replace('ferrumgate-activity-', '').substring(6, 2));
+                    const year = Number(x.index.replace(indexSearch, '').substring(0, 4));
+                    const month = Number(x.index.replace(indexSearch, '').substring(4, 2));
+                    const day = Number(x.index.replace(indexSearch, '').substring(6, 2));
                     x.val = new Date(year, month, day).getTime();
                 } catch (ignore) {
                     x.val = 0;//delete if not parsed correctly
@@ -72,6 +73,8 @@ export class ESDeleteOldLogs {
             logger.error(err);
         }
     }
+
+
 
 
 
