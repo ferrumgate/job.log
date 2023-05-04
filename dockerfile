@@ -5,7 +5,8 @@ RUN apt update &&\
 #Create app directory
 WORKDIR /usr/src/app
 RUN sed -i 's/providers = provider_sect/#providers = provider_sect/g' /etc/ssl/openssl.cnf
-
+RUN sed -i 's/^MinProtocol.*/MinProtocol = TLSv1/g' /etc/ssl/openssl.cnf
+RUN sed -i 's/^CipherString.*/CipherString = DEFAULT:@SECLEVEL=1/g' /etc/ssl/openssl.cnf
 
 ADD node_modules/rest.portal2 /usr/src/rest.portal/build/src
 WORKDIR /usr/src/rest.portal/build/src
