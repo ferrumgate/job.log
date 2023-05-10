@@ -19,10 +19,11 @@ async function main() {
     //const sockPath = process.env.SYSLOG_PATH || '/tmp/syslog.sock';
     //const syslog = new SyslogService(sockPath, await createRedis(), await createRedis(), '/logs/activity/svc');
     //await syslog.start();
+    const gatewayId = process.env.GATEWAY_ID || Util.randomNumberString(16);
     const redis = await createRedis();
-    let systemlogService: SystemLogService = new SystemLogService(redis, await createRedis(), process.env.ENCRYPT_KEY || '');
+    let systemlogService: SystemLogService = new SystemLogService(redis, await createRedis(), process.env.ENCRYPT_KEY || '', `job.log/${gatewayId}`);
     let configService: RedisConfigWatchCachedService =
-        new RedisConfigWatchCachedService(redis, await createRedis(), systemlogService, true, process.env.ENCRYPT_KEY || '');
+        new RedisConfigWatchCachedService(redis, await createRedis(), systemlogService, true, process.env.ENCRYPT_KEY || '', `job.log/${gatewayId}`);
 
     await configService.start();
     const bcastService = new BroadcastService();
