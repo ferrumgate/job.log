@@ -13,6 +13,9 @@ import { DeviceLogToES } from "./deviceLogToES";
 async function createRedis() {
     return new RedisService(process.env.REDIS_HOST, process.env.REDIS_PASS);
 }
+async function createRedisLocal() {
+    return new RedisService(process.env.REDIS_LOCAL_HOST, process.env.REDIS_LOCAL_PASS);
+}
 
 async function main() {
 
@@ -21,6 +24,7 @@ async function main() {
     //await syslog.start();
     const gatewayId = process.env.GATEWAY_ID || Util.randomNumberString(16);
     const redis = await createRedis();
+    const redisLocal = await createRedisLocal();
     let systemlogService: SystemLogService = new SystemLogService(redis, await createRedis(), process.env.ENCRYPT_KEY || '', `job.log/${gatewayId}`);
     let configService: RedisConfigWatchCachedService =
         new RedisConfigWatchCachedService(redis, await createRedis(), systemlogService, true, process.env.ENCRYPT_KEY || '', `job.log/${gatewayId}`);
@@ -39,7 +43,7 @@ async function main() {
     let svcParser: SvcActivityLogParser;
     if (process.env.MODULE_SYSLOG == 'true') {
         const port = Number(process.env.SYSLOG_PORT) || 9292;
-        syslog = new SyslogUdpService(port, redis, await createRedis(), '/logs/activity/svc');
+        syslog = new SyslogUdpService(port, redisLocal, await createRedisLocal(), '/logs/activity/svc');
         await syslog.start();
     }
 
@@ -48,21 +52,21 @@ async function main() {
     //await leader.start();
 
     if (process.env.MODULE_ACTIVITY_TO_ES == 'true') {
-        activity = new ActivityLogToES(redis, await createRedis(), leader, configService);
+        activity = new ActivityLogToES(redisLocal, await createRedisLocal(), leader, configService);
         await activity.start();
     }
     if (process.env.MODULE_DEVICE_TO_ES == 'true') {
-        device = new DeviceLogToES(redis, await createRedis(), leader, configService);
+        device = new DeviceLogToES(redisLocal, await createRedisLocal(), leader, configService);
         await device.start();
     }
 
     if (process.env.MODULE_AUDIT_TO_ES == 'true') {
-        audit = new AuditLogToES(encKey, redis, await createRedis(), leader, configService)
+        audit = new AuditLogToES(encKey, redisLocal, await createRedisLocal(), leader, configService)
         await audit.start();
     }
 
     if (process.env.MODULE_ACTIVITY_SVC_PARSER == 'true') {
-        svcParser = new SvcActivityLogParser(redis, await createRedis(), '', configService, systemWatchService)
+        svcParser = new SvcActivityLogParser(redisLocal, await createRedisLocal(), '', configService, systemWatchService)
         await svcParser.start();
     }
 

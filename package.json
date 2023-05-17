@@ -1,6 +1,6 @@
 {
   "name": "job.log",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "manages system logs",
   "main": "main.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "url": "git+ssh://git@gitlab.com/ferrumgate/job.log.git"
   },
   "publishConfig": {
-    "tag": "rest.portal@1.8.0"
+    "tag": "rest.portal@1.9.0"
   },
   "author": "",
   "license": "ISC",
