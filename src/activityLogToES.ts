@@ -50,10 +50,18 @@ export class ActivityLogToES {
 
 
     async start() {
+        await this.fakeData();
         await this.watchGroup.start(true);
     }
     async stop() {
         await this.watchGroup.stop(true);
+    }
+
+    async fakeData() {
+        try {
+            const base64 = Util.jencode({}).toString('base64url');// Buffer.from(JSON.stringify(act)).toString('base64url')
+            await this.redis.xadd(this.activityStreamKey, { val: base64, type: 'b64' });
+        } catch (ignore) { }
     }
 
 
