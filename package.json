@@ -4,7 +4,7 @@
   "description": "manages system logs",
   "main": "main.js",
   "scripts": {
-    "test": "NODE_ENV=development DEBUG2=nock.* node ./node_modules/mocha/bin/mocha --exit --timeout 30000 --require ts-node/register test/**/esDeleteOldLogs.integration.spec.ts",
+    "test": "NODE_ENV=development DEBUG2=nock.* node ./node_modules/mocha/bin/mocha --exit --timeout 30000 --require ts-node/register test/**/svcActivityLogParser.spec.ts",
     "testintegration": "DEBUG=nock.* node ./node_modules/mocha/bin/mocha --exit  --require ts-node/register test/**/deviceLogToES.integration.spec.ts",
     "build": "tsc ",
     "start": "tsc && NODE_ENV=development  node ./build/src/main.js",

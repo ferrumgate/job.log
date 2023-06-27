@@ -31,8 +31,9 @@ describe('activityLogToES ', async () => {
             authSource: 'local', requestId: '123', status: 0,
             type: 'login try',
             userId: '12131a',
-            username: 'abcda@email.com'
-        }
+            username: 'abcda@email.com',
+            abo: 'abc'
+        } as any;
 
         const log2: ActivityLog = {
             insertDate: new Date().toISOString(),
@@ -75,15 +76,15 @@ describe('activityLogToES ', async () => {
         await activityLog.start();
         await Util.sleep(15000);
         await activityLog.stop();
-        //await Util.sleep(120000);
-        /* const result = await es.search({
+        await Util.sleep(120000);
+        const result = await es.search({
             index: 'ferrumgate-activity', body: {
                 query: {
                     match_all: {}
                 }
             }
-        }) */
-        // expect(result.hits.total.value > 0).to.be.true;
+        })
+        expect(result.hits.total.value > 0).to.be.true;
 
 
 
