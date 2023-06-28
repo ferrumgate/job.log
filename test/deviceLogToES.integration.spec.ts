@@ -5,16 +5,14 @@ import { DeviceLog, DeviceService, ConfigService, ESService, RedisService, Redis
 import { Leader } from '../src/leader';
 import { DeviceLogToES } from '../src/deviceLogToES';
 import { BroadcastService } from 'rest.portal/service/broadcastService';
-
+import { esHost, esPass, esUser } from './common.spec';
 
 
 
 const expect = chai.expect;
 
 
-const esHost = 'https://192.168.88.250:9200';
-const esUser = "elastic";
-const esPass = '123456';
+
 describe('deviceLogToES ', async () => {
 
 

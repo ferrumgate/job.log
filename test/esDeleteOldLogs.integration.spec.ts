@@ -10,16 +10,13 @@ import { ESDeleteOldLogs } from '../src/esDeleteOldLogs';
 import { BroadcastService } from 'rest.portal/service/broadcastService';
 import { DeviceLogToES } from '../src/deviceLogToES';
 
-
+import { esHost, esPass, esUser } from './common.spec';
 
 
 const expect = chai.expect;
 
 
 
-const esHost = 'https://192.168.88.250:9200';
-const esUser = "elastic";
-const esPass = '123456';
 describe('esDeleteOldLogs ', async () => {
     const redis = new RedisService();
     beforeEach(async () => {

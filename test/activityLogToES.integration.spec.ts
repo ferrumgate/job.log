@@ -5,6 +5,7 @@ import { ActivityLog, ActivityService, ConfigService, ESService, RedisService, R
 import { Leader } from '../src/leader';
 import { ActivityLogToES } from '../src/activityLogToES';
 import { BroadcastService } from 'rest.portal/service/broadcastService';
+import { esHost, esPass, esUser } from './common.spec';
 
 
 
@@ -12,9 +13,6 @@ import { BroadcastService } from 'rest.portal/service/broadcastService';
 const expect = chai.expect;
 
 
-const esHost = 'https://192.168.88.250:9200';
-const esUser = "elastic";
-const esPass = '123456';
 describe('activityLogToES ', async () => {
 
 
@@ -62,23 +60,23 @@ describe('activityLogToES ', async () => {
         const redis2 = new RedisService();
         const es = new ESService(configService, esHost, esUser, esPass);
         await Util.sleep(1000);
-
+        await es.reset();
         const { log1, log2 } = createSampleData();
 
         const activityService = new ActivityService(redis, es);
         await activityService.save(log1);
         await activityService.save(log2);
 
-        await es.reset();
+
         const watcher = new Leader('redis', redis, 'localhost');
         //watcher.isMe = true;
         const activityLog = new Mock(redis, redis2, watcher, configService);
         await activityLog.start();
         await Util.sleep(15000);
         await activityLog.stop();
-        await Util.sleep(120000);
+        await Util.sleep(60000);
         const result = await es.search({
-            index: 'ferrumgate-activity', body: {
+            index: 'ferrumgate-activity*', body: {
                 query: {
                     match_all: {}
                 }
