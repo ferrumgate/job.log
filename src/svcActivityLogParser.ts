@@ -1,4 +1,4 @@
-import { ActivityLog, ESService, ESServiceExtended, ESServiceLimited, logger, RedisCachedConfigService, RedisConfigWatchCachedService, RedisConfigWatchService, RedisService, Util, WatchGroupService, WatchItem, WatchService } from "rest.portal";
+import { ActivityLog, ESService, ESServiceExtended, ESServiceLimited, fqdnCategoriesMap, logger, RedisCachedConfigService, RedisConfigWatchCachedService, RedisConfigWatchService, RedisService, Util, WatchGroupService, WatchItem, WatchService } from "rest.portal";
 import { BroadcastService } from "rest.portal/service/broadcastService";
 import { PolicyAuthzErrors } from "rest.portal/service/policyService";
 import { ESServiceLimitedExtended } from "./service/esServiceExtended";
@@ -48,9 +48,15 @@ export class SvcActivityLogParser {
     }
     async parse(log: string) {
         const parts = log.split(',');
+        let logId = '';
+
         let result: ActivityLog = { trackId: 0, requestId: Util.randomNumberString(16), type: 'service allow', authSource: '', status: 200, insertDate: new Date().toISOString(), ip: '' }
         parts.forEach((val, index) => {
             switch (index) {
+                case 1:
+                    logId = val; break;
+                case 4:
+                    result.serviceProtocol = val; break;
                 case 5:
                     result.insertDate = new Date(Util.convertToNumber(val) / 1000).toISOString(); break;
                 case 6:
@@ -92,6 +98,12 @@ export class SvcActivityLogParser {
 
             }
         })
+        if (result.serviceProtocol == 'dns') {
+            result.dnsQueryType = parts[19];
+            result.dnsQuery = parts[20] ? Buffer.from(parts[20], 'base64').toString('utf-8') : '';
+            result.dnsStatus = parts[21];
+            result.dnsFqdnCategoryId = parts[22];
+        }
         if (!Util.isUndefinedOrNull(result.trackId))
             return result;
         return null;
@@ -132,6 +144,11 @@ export class SvcActivityLogParser {
         item.isProxyIp = session?.isProxyIp;
         item.isCrawlerIp = session?.isCrawlerIp;
         item.isHostingIp = session?.isHostingIp;
+
+        if (item.serviceProtocol == 'dns') {
+            if (item.dnsFqdnCategoryId)
+                item.dnsFqdnCategoryName = fqdnCategoriesMap.get(item.dnsFqdnCategoryId)?.name;
+        }
 
 
     }

@@ -89,12 +89,15 @@ describe('svcActivityLogParser ', async () => {
         await Util.sleep(1000);
 
         const parser = new SvcActivityLogParser(new RedisService(), new RedisService(), encKey, redisConfig, watch);
-        const log = await parser.parse(',1000,232323,1,1,1000,2,1,3,1234,123456,12,someid,randomtunnelid,1.2.3.4,3456,tcp,2.3.4.5,89');
+        //,randominstance1687469356697422,1,0,dns,1687469356697467,0,0,0,gateway1,mysqlservice,ttyy,abc,,192.168.88.250,42780,udp,192.168.88.250,5555,a,www.ferrumgate.com,allow,w9FTQWw5e56Txcld
+        //',1000,232323,1,1,1000,2,1,3,1234,123456,12,someid,randomtunnelid,1.2.3.4,3456,tcp,2.3.4.5,89'
+        const log = await parser.parse(',randominstance1687469356697422,1,0,raw,1000,2,1,3,1234,123456,12,someid,randomtunnelid,1.2.3.4,3456,tcp,2.3.4.5,89');
         expect(log).exist;
 
         if (log) {
             expect(log.insertDate).to.equal(new Date(1).toISOString());
             expect(log.trackId).to.equal(2);
+            expect(log.serviceProtocol).to.equal('raw');
             expect(log.status).to.equal(401);
             expect(log.type).to.equal('service deny');
             expect(log.statusMessage).to.equal('UserNotFound');
@@ -130,6 +133,83 @@ describe('svcActivityLogParser ', async () => {
 
 
     }).timeout(20000);
+
+
+
+
+    it('parse dns', async () => {
+        const systemlog = new SystemLogService(new RedisService(), new RedisService(), encKey)
+        const config = new RedisConfigService(new RedisService(), new RedisService(), systemlog, encKey);
+        await config.init();
+        const { tunnelService, sessionService, user, session1, session2, session3, tunnel1, tunnel2 } = await prepareData(config);
+        const watch = new SystemWatchService(tunnelService, sessionService, systemlog, new BroadcastService());
+        await watch.start();
+        await Util.sleep(1000);
+
+
+
+        const redisConfig = new RedisConfigWatchCachedService(new RedisService(), new RedisService(), systemlog, true, encKey);
+        await redisConfig.start();
+
+
+        await Util.sleep(1000);
+
+        const parser = new SvcActivityLogParser(new RedisService(), new RedisService(), encKey, redisConfig, watch);
+        //,randominstance1687469356697422,1,0,dns,1687469356697467,0,0,0,gateway1,mysqlservice,ttyy,abc,,192.168.88.250,42780,udp,192.168.88.250,5555,a,www.ferrumgate.com,allow,w9FTQWw5e56Txcld
+        //',1000,232323,1,1,1000,2,1,3,1234,123456,12,someid,randomtunnelid,1.2.3.4,3456,tcp,2.3.4.5,89'
+
+        const log = await parser.parse(',randominstance1687469356697422,1,0,dns,1000,2,1,3,1234,123456,12,someid,randomtunnelid,1.2.3.4,3456,tcp,2.3.4.5,89,a,d3d3LmZlcnJ1bWdhdGUuY29t,allow,w9FTQWw5e56Txcld');
+        //const log = await parser.parse(',2WgCTs2YnLFyH8eD1687769809915636,1,0,dns,1687,7,0,0,zhc9,hT6emTpaO,hVOVHZ,,6GOC43HpOiWEUkEH,,,100.64.0.7,48845,udp,1.1.1.1,53,aaaa,ZS0wMDE0LmUtbXNlZGdlLm5ldA==,allow,w9FTQWw5e56Txcld');
+        expect(log).exist;
+        if (log)
+            await parser.fillItem(log);
+        if (log) {
+            expect(log.insertDate).to.equal(new Date(1).toISOString());
+            expect(log.trackId).to.equal(2);
+            expect(log.serviceProtocol).to.equal('dns');
+            expect(log.status).to.equal(401);
+            expect(log.type).to.equal('service deny');
+            expect(log.statusMessage).to.equal('UserNotFound');
+            expect(log.gatewayId).to.equal('1234');
+            expect(log.serviceId).to.equal('123456');
+            expect(log.authzRuleId).to.equal('12');
+            expect(log.userId).to.equal('someid');
+            expect(log.tunnelId).to.equal('randomtunnelid');
+            expect(log.sourceIp).to.equal('1.2.3.4');
+            expect(log.sourcePort).to.equal(3456);
+            expect(log.networkProtocol).to.equal('tcp');
+            expect(log.destinationIp).to.equal('2.3.4.5');
+            expect(log.destinationPort).to.equal(89);
+            expect(log.dnsQueryType).to.equal('a');
+            expect(log.dnsQuery).to.equal('www.ferrumgate.com');
+            expect(log.dnsStatus).to.equal('allow');
+            expect(log.dnsFqdnCategoryId).to.equal('w9FTQWw5e56Txcld');
+
+        }
+        if (log) {
+            await parser.fillItem(log);
+            expect(log.gatewayName).to.equal('testgateway');
+            expect(log.networkId).to.equal('12345');
+            expect(log.networkName).to.equal('testnetwork');
+            expect(log.serviceName).to.equal('testservice');
+            expect(log.authnRuleName).to.be.undefined;
+            expect(log.username).to.equal('hamza@ferrumgate.com');
+            expect(log.user2FA).to.be.true;
+            expect(log.tunType).to.equal('ssh');
+            expect(log.tun).to.equal('tun0');
+            expect(log.ip).to.equal(session1.ip);
+            expect(log.is2FA).to.be.false;
+            expect(log.authSource).to.equal('local');
+            expect(log.assignedIp).to.equal('10.0.0.3')
+            expect(log.dnsFqdnCategoryName).to.equal('Unknown')
+
+        }
+
+
+
+    }).timeout(20000);
+
+
 
 
 

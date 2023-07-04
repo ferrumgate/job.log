@@ -5,7 +5,7 @@ import { AuditLog, AuditService, ConfigService, ESService, RedisService, RedisWa
 import { Leader } from '../src/leader';
 import { AuditLogToES } from '../src/auditLogToES';
 import { BroadcastService } from 'rest.portal/service/broadcastService';
-
+import { esHost, esPass, esUser } from './common.spec';
 
 
 
@@ -14,9 +14,7 @@ const expect = chai.expect;
 
 
 
-const esHost = 'https://192.168.88.250:9200';
-const esUser = "elastic";
-const esPass = '123456';
+
 describe('auditLogToES ', async () => {
     const redis = new RedisService();
     beforeEach(async () => {
