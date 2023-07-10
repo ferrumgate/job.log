@@ -83,7 +83,7 @@ describe('deviceLogToES ', async () => {
 
         const { log1, log2 } = createSampleData();
 
-        const deviceService = new DeviceService(configService, redis, es);
+        const deviceService = new DeviceService(configService, redis, redis, es);
         await deviceService.save(log1);
         await deviceService.save(log2);
 
