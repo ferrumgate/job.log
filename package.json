@@ -1,6 +1,6 @@
 {
   "name": "job.log",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "description": "manages system logs",
   "main": "main.js",
   "scripts": {
@@ -10,14 +10,14 @@
     "start": "tsc && NODE_ENV=development  node ./build/src/main.js",
     "startdocker": "node ./build/src/main.js",
     "startprod": "REDIS_HOST=localhost node ./src/main.js",
-    "link": "npm link rest.portal@1.5.0 --save"
+    "link": "npm link rest.portal@1.14.0 --save"
   },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@gitlab.com/ferrumgate/job.log.git"
   },
   "publishConfig": {
-    "tag": "rest.portal@1.11.0"
+    "tag": "rest.portal@1.14.0"
   },
   "author": "",
   "license": "ISC",
