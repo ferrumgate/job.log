@@ -44,7 +44,7 @@ export class AuditLogToES {
     }
     async fakeData() {
         try {
-            const base64 = Util.jencode({}).toString('base64url');// Buffer.from(JSON.stringify(act)).toString('base64url')
+            const base64 = Util.jencode({ insertDate: new Date().toISOString() }).toString('base64url');// Buffer.from(JSON.stringify(act)).toString('base64url')
             await this.redis.xadd(this.auditStreamKey, { val: base64, type: 'b64' });
         } catch (ignore) { }
     }
