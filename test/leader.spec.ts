@@ -1,12 +1,8 @@
-
 import chai from 'chai';
 import { RedisService, Util } from 'rest.portal';
 import { Leader } from '../src/leader';
 
-
-
 const expect = chai.expect;
-
 
 describe.skip('leader ', async () => {
     const redis = new RedisService();
@@ -43,7 +39,6 @@ describe.skip('leader ', async () => {
 
         expect(leader.isMe).to.be.true;
         await leader.stop();
-
 
     }).timeout(120000);
 
@@ -84,8 +79,6 @@ describe.skip('leader ', async () => {
 
     }).timeout(120000);
 
-
-
     it('leaderElectionTry2', async () => {
         const leader = new Leader('job.log', redis, 'localhost:6379');
         const leader2 = new Leader('job.log', redis, 'localhost:6379');
@@ -125,8 +118,5 @@ describe.skip('leader ', async () => {
         await leader2.stop();
 
     }).timeout(240000);
-
-
-
 
 })

@@ -1,9 +1,9 @@
-import net from 'node:net'
-import fs from 'fs'
+import fs from 'fs';
 import udp from 'node:dgram';
-import { logger, RedisService, WatchService, WatchBufferedWriteService } from 'rest.portal';
-
+import net from 'node:net';
+import { RedisService, WatchBufferedWriteService, logger } from 'rest.portal';
 const { setIntervalAsync, clearIntervalAsync } = require('set-interval-async');
+
 export class SyslogService {
     /**
      *
@@ -73,14 +73,12 @@ export class SyslogService {
     }
 }
 
-
 export class SyslogUdpService {
     /**
          *
          */
     server!: udp.Socket;
     log: WatchBufferedWriteService;
-
 
     constructor(private port: number, redis: RedisService, redisStream: RedisService, logPath = '/logs/activity/svc') {
         this.log = new WatchBufferedWriteService(redis, redisStream, logPath);
@@ -94,12 +92,10 @@ export class SyslogUdpService {
             logger.error(err);
         })
 
-
         this.server.on('message', async (data: Buffer) => {
             logger.debug(`data received ${data.toString()}`);
             await this.log.write(data.toString('utf-8'));
         })
-
 
         this.server.on('listening', () => {
             logger.info(`syslog listening on ${this.server.address().address}:${this.server.address().port}`);

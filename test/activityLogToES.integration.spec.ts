@@ -1,26 +1,16 @@
-
-import chai, { util } from 'chai';
-
-import { ActivityLog, ActivityService, ConfigService, ESService, RedisService, RedisWatcherService, Util } from 'rest.portal';
-import { Leader } from '../src/leader';
+import chai from 'chai';
+import { ActivityLog, ActivityService, ConfigService, ESService, RedisService, Util } from 'rest.portal';
 import { ActivityLogToES } from '../src/activityLogToES';
-import { BroadcastService } from 'rest.portal/service/broadcastService';
+import { Leader } from '../src/leader';
 import { esHost, esPass, esUser } from './common.spec';
-
-
-
 
 const expect = chai.expect;
 
-
 describe('activityLogToES ', async () => {
-
 
     beforeEach(async () => {
 
-
     })
-
 
     function createSampleData() {
         const log1: ActivityLog = {
@@ -67,7 +57,6 @@ describe('activityLogToES ', async () => {
         await activityService.save(log1);
         await activityService.save(log2);
 
-
         const watcher = new Leader('redis', redis, 'localhost');
         //watcher.isMe = true;
         const activityLog = new Mock(redis, redis2, watcher, configService);
@@ -84,11 +73,7 @@ describe('activityLogToES ', async () => {
         })
         expect(result.hits.total.value > 0).to.be.true;
 
-
-
     }).timeout(200000);
 
-
 })
-
 

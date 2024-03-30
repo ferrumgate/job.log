@@ -1,9 +1,7 @@
-import { ConfigService, ESService, ESServiceExtended, ESServiceLimited, logger, RedisService, RedisWatcherService, Util, WatchGroupService, WatchItem } from "rest.portal";
+import { ConfigService, ESService, ESServiceExtended, logger, RedisService, Util, WatchGroupService, WatchItem } from "rest.portal";
 import { AuditLog } from "rest.portal/model/auditLog";
-import { ESServiceLimitedExtended } from "./service/esServiceExtended";
 import { Leader } from "./leader";
-import { BroadcastService } from "rest.portal/service/broadcastService";
-
+import { ESServiceLimitedExtended } from "./service/esServiceExtended";
 const { setIntervalAsync, clearIntervalAsync } = require('set-interval-async');
 
 /**
@@ -34,7 +32,6 @@ export class AuditLogToES {
             return new ESServiceExtended(this.configService);
     }
 
-
     async start() {
         await this.fakeData();
         await this.watchGroup.start(true);
@@ -48,8 +45,6 @@ export class AuditLogToES {
             await this.redis.xadd(this.auditStreamKey, { val: base64, type: 'b64' });
         } catch (ignore) { }
     }
-
-
 
     async processData(datas: WatchItem<AuditLog>[]) {
         let pushItems = [];
@@ -70,6 +65,5 @@ export class AuditLogToES {
             logger.info(`audit logs written to es size: ${pushItems.length}`)
         }
     }
-
 
 }

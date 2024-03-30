@@ -1,16 +1,11 @@
-
 import chai from 'chai';
-import { ConfigService, Gateway, Network, RedisConfigService, RedisConfigWatchCachedService, RedisService, Service, SessionService, SystemLogService, TunnelService, User, Util } from 'rest.portal';
-import { SystemWatchService } from '../src/systemWatchService';
-import { Leader } from '../src/leader';
-import { SvcActivityLogParser } from '../src/svcActivityLogParser';
-import { DhcpService } from 'rest.portal/service/dhcpService';
+import { Gateway, Network, RedisConfigService, RedisConfigWatchCachedService, RedisService, Service, SessionService, SystemLogService, TunnelService, User, Util } from 'rest.portal';
 import { BroadcastService } from 'rest.portal/service/broadcastService';
-
-
+import { DhcpService } from 'rest.portal/service/dhcpService';
+import { SvcActivityLogParser } from '../src/svcActivityLogParser';
+import { SystemWatchService } from '../src/systemWatchService';
 
 const expect = chai.expect;
-
 
 describe('svcActivityLogParser ', async () => {
     const encKey = 'mn4xq0zeryusnagsdkbb2a68r7uu3nn25q4i91orj3ofkgb42d6nw5swqd7sz4fm';
@@ -80,11 +75,8 @@ describe('svcActivityLogParser ', async () => {
         await watch.start();
         await Util.sleep(1000);
 
-
-
         const redisConfig = new RedisConfigWatchCachedService(new RedisService(), new RedisService(), systemlog, true, encKey);
         await redisConfig.start();
-
 
         await Util.sleep(1000);
 
@@ -130,12 +122,7 @@ describe('svcActivityLogParser ', async () => {
 
         }
 
-
-
     }).timeout(20000);
-
-
-
 
     it('parse dns', async () => {
         const systemlog = new SystemLogService(new RedisService(), new RedisService(), encKey)
@@ -146,11 +133,8 @@ describe('svcActivityLogParser ', async () => {
         await watch.start();
         await Util.sleep(1000);
 
-
-
         const redisConfig = new RedisConfigWatchCachedService(new RedisService(), new RedisService(), systemlog, true, encKey);
         await redisConfig.start();
-
 
         await Util.sleep(1000);
 
@@ -205,12 +189,6 @@ describe('svcActivityLogParser ', async () => {
 
         }
 
-
-
     }).timeout(20000);
-
-
-
-
 
 })

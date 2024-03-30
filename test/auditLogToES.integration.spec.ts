@@ -1,19 +1,10 @@
-
 import chai from 'chai';
-
-import { AuditLog, AuditService, ConfigService, ESService, RedisService, RedisWatcherService, Util } from 'rest.portal';
-import { Leader } from '../src/leader';
+import { AuditLog, AuditService, ConfigService, ESService, RedisService, Util } from 'rest.portal';
 import { AuditLogToES } from '../src/auditLogToES';
-import { BroadcastService } from 'rest.portal/service/broadcastService';
+import { Leader } from '../src/leader';
 import { esHost, esPass, esUser } from './common.spec';
 
-
-
-
 const expect = chai.expect;
-
-
-
 
 describe('auditLogToES ', async () => {
     const redis = new RedisService();
@@ -22,7 +13,6 @@ describe('auditLogToES ', async () => {
         await redis.flushAll();
 
     })
-
 
     const streamKey = '/logs/audit';
     function createSampleData() {
@@ -60,7 +50,6 @@ describe('auditLogToES ', async () => {
             }
         }
 
-
         const redis = new RedisService();
         await redis.flushAll();
         const redis2 = new RedisService();
@@ -91,10 +80,7 @@ describe('auditLogToES ', async () => {
         expect(result.hits.total.value > 0).to.be.true;
  */
 
-
     }).timeout(200000);
 
-
 })
-
 

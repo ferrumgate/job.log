@@ -1,26 +1,16 @@
-
-import chai, { util } from 'chai';
-
-import { DeviceLog, DeviceService, ConfigService, ESService, RedisService, RedisWatcherService, Util } from 'rest.portal';
-import { Leader } from '../src/leader';
+import chai from 'chai';
+import { ConfigService, DeviceLog, DeviceService, ESService, RedisService, Util } from 'rest.portal';
 import { DeviceLogToES } from '../src/deviceLogToES';
-import { BroadcastService } from 'rest.portal/service/broadcastService';
+import { Leader } from '../src/leader';
 import { esHost, esPass, esUser } from './common.spec';
-
-
 
 const expect = chai.expect;
 
-
-
 describe('deviceLogToES ', async () => {
-
 
     beforeEach(async () => {
 
-
     })
-
 
     function createSampleData() {
         let log1: DeviceLog = {
@@ -40,7 +30,6 @@ describe('deviceLogToES ', async () => {
             serial: 'asdfaf',
             userId: 'asdfafa',
             username: 'adfasdfawe',
-
 
         }
         let log2: DeviceLog = {
@@ -105,10 +94,7 @@ describe('deviceLogToES ', async () => {
         expect(result.hits.total.value > 0).to.be.true;
  */
 
-
     }).timeout(200000);
 
-
 })
-
 

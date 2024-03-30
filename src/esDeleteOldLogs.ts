@@ -1,16 +1,10 @@
-import { ConfigService, ESService, ESServiceExtended, ESServiceLimited, logger, RedisService, RedisWatcherService, Util, WatchGroupService, WatchItem } from "rest.portal";
-import { AuditLog } from "rest.portal/model/auditLog";
-import { ESServiceLimitedExtended } from "./service/esServiceExtended";
-import { Leader } from "./leader";
-import { BroadcastService } from "rest.portal/service/broadcastService";
-
+import { ConfigService, ESService, ESServiceExtended, logger } from "rest.portal";
 const { setIntervalAsync, clearIntervalAsync } = require('set-interval-async');
 
 /**
  * @summary deletes old elasticsearch logs
  */
 export class ESDeleteOldLogs {
-
 
     es: ESService;
     interval: any;
@@ -23,7 +17,6 @@ export class ESDeleteOldLogs {
 
         return new ESServiceExtended(this.configService);
     }
-
 
     async start() {
         this.interval = setIntervalAsync(async () => {
@@ -73,10 +66,5 @@ export class ESDeleteOldLogs {
             logger.error(err);
         }
     }
-
-
-
-
-
 
 }

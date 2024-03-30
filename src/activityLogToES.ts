@@ -1,12 +1,6 @@
-import { createSecretKey } from "crypto";
-import { ActivityLog, ConfigService, ESService, ESServiceExtended, ESServiceLimited, logger, RedisService, RedisWatcherService, Util, WatchGroupService, WatchItem } from "rest.portal";
-import { ConfigWatch } from "rest.portal/model/config";
-import { BroadcastService } from "rest.portal/service/broadcastService";
-
+import { ActivityLog, ConfigService, ESService, ESServiceExtended, logger, RedisService, Util, WatchGroupService, WatchItem } from "rest.portal";
 import { Leader } from "./leader";
 import { ESServiceLimitedExtended } from "./service/esServiceExtended";
-
-
 const { setIntervalAsync, clearIntervalAsync } = require('set-interval-async');
 
 /**
@@ -35,10 +29,6 @@ export class ActivityLogToES {
 
     }
 
-
-
-
-
     createESService(): ESService {
 
         if (process.env.LIMITED_MODE == 'true')
@@ -46,8 +36,6 @@ export class ActivityLogToES {
         else
             return new ESServiceExtended(this.configService);
     }
-
-
 
     async start() {
         await this.fakeData();
@@ -63,8 +51,6 @@ export class ActivityLogToES {
             await this.redis.xadd(this.activityStreamKey, { val: base64, type: 'b64' });
         } catch (ignore) { }
     }
-
-
 
     async processData(datas: WatchItem<ActivityLog>[]) {
         let pushItems = [];
@@ -85,6 +71,5 @@ export class ActivityLogToES {
             logger.info(`activity logs written to es size: ${pushItems.length}`)
         }
     }
-
 
 }

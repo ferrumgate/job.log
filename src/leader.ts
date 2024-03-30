@@ -1,8 +1,6 @@
-
 import EventEmitter from "node:events";
 import { logger, PingService, RedisService, RedLockService, Util } from "rest.portal";
 const { setIntervalAsync, clearIntervalAsync } = require('set-interval-async');
-
 
 export class Leader {
     events: EventEmitter = new EventEmitter();
@@ -39,14 +37,10 @@ export class Leader {
             await this.leaderElection();
         }, 15000);
 
-
-
-
     }
     async ping(packetCount = 100, maxSeconds = 10) {
         try {
             if (Util.now() - this.pingResult.lastPing < 30 * 60 * 1000) return;//check every 30 minutes
-
 
             const hosts = this.pingHost;
 
@@ -69,7 +63,6 @@ export class Leader {
             this.pingResult.avg = 1000000000000;
             this.pingResult.alive = false
             this.pingResult.lastPing = new Date().getTime();
-
 
         } catch (err) {
             logger.error(err);
@@ -112,7 +105,6 @@ export class Leader {
                 if (this.leader.isMe) {
                     await this.dropLeader();
                 }
-
 
         } catch (err) {
             logger.error(err);

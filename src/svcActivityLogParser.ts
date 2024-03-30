@@ -1,15 +1,11 @@
-import { ActivityLog, ESService, ESServiceExtended, ESServiceLimited, fqdnCategoriesMap, logger, RedisCachedConfigService, RedisConfigWatchCachedService, RedisConfigWatchService, RedisService, Util, WatchGroupService, WatchItem, WatchService } from "rest.portal";
-import { BroadcastService } from "rest.portal/service/broadcastService";
+import { ActivityLog, ESService, ESServiceExtended, fqdnCategoriesMap, logger, RedisConfigWatchCachedService, RedisService, Util, WatchGroupService, WatchItem } from "rest.portal";
 import { PolicyAuthzErrors } from "rest.portal/service/policyService";
 import { ESServiceLimitedExtended } from "./service/esServiceExtended";
 import { SystemWatchService } from "./systemWatchService";
 
-
-
 export class SvcActivityLogParser {
     logs = `/logs/activity/svc`;
     logWatcher: WatchGroupService;
-
 
     es: ESService;
     constructor(private redis: RedisService, private redisStream: RedisService, private encKey: string,
@@ -91,10 +87,7 @@ export class SvcActivityLogParser {
                 case 18:
                     result.destinationPort = Util.convertToNumber(val); break;
 
-
-
                 default: break;
-
 
             }
         })
@@ -150,7 +143,6 @@ export class SvcActivityLogParser {
                 item.dnsFqdnCategoryName = fqdnCategoriesMap.get(item.dnsFqdnCategoryId)?.name;
         }
 
-
     }
     async processData(datas: WatchItem<string>[]) {
         let pushItems = [];
@@ -163,7 +155,6 @@ export class SvcActivityLogParser {
                     const nitem = await this.es.activityCreateIndexIfNotExits(item);
                     pushItems.push(nitem);
                 }
-
 
             } catch (err) {
                 logger.error(err);
@@ -182,8 +173,5 @@ export class SvcActivityLogParser {
     async stop() {
         await this.logWatcher.stop(true);
     }
-
-
-
 
 }

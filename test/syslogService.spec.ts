@@ -1,14 +1,8 @@
-
-//docker run --net=host --name redis --rm -d redis
-
-
 import chai from 'chai';
-
-import { RedisService, SystemLogService, Util } from 'rest.portal';
-import { SyslogService, SyslogUdpService } from '../src/syslogService';
-import net from 'node:net';
 import udp from 'node:dgram';
-
+import net from 'node:net';
+import { RedisService, Util } from 'rest.portal';
+import { SyslogService, SyslogUdpService } from '../src/syslogService';
 
 const expect = chai.expect;
 
@@ -16,7 +10,6 @@ describe('syslogService', () => {
     const simpleRedis = new RedisService();
     beforeEach(async () => {
         await simpleRedis.flushAll();
-
 
     })
     class Client {
@@ -59,7 +52,6 @@ describe('syslogService', () => {
     }
     async function createClient(path: string) {
 
-
     }
 
     it('read/write', async () => {
@@ -73,7 +65,6 @@ describe('syslogService', () => {
         await Util.sleep(1000);
         const result = await simpleRedis.xread(log, 1000, '0', 100);
         expect(result.length).to.equal(1);
-
 
     })
 
@@ -110,17 +101,13 @@ describe('syslogService', () => {
         }
         expect(totalCount).to.equal(2000);
 
-
     })
 })
-
-
 
 describe('syslogUdpService', () => {
     const simpleRedis = new RedisService();
     beforeEach(async () => {
         await simpleRedis.flushAll();
-
 
     })
 
@@ -139,11 +126,7 @@ describe('syslogUdpService', () => {
         await syslog.stop();
         expect(result.length).to.equal(1);
 
-
     }).timeout(150000)
 
-
 })
-
-
 

@@ -1,14 +1,14 @@
-import { AuditLog, logger, RedisConfigWatchCachedService, RedisService, SessionService, SystemLogService, TunnelService, Util } from "rest.portal"
+import { logger, RedisConfigWatchCachedService, RedisService, SessionService, SystemLogService, TunnelService, Util } from "rest.portal";
+import { BroadcastService } from "rest.portal/service/broadcastService";
+import { DhcpService } from "rest.portal/service/dhcpService";
 import { ActivityLogToES } from "./activityLogToES";
 import { AuditLogToES } from "./auditLogToES";
+import { DeviceLogToES } from "./deviceLogToES";
+import { ESDeleteOldLogs } from "./esDeleteOldLogs";
 import { Leader } from "./leader";
 import { SvcActivityLogParser } from "./svcActivityLogParser";
-import { SyslogService, SyslogUdpService } from "./syslogService";
+import { SyslogUdpService } from "./syslogService";
 import { SystemWatchService } from "./systemWatchService";
-import { ESDeleteOldLogs } from "./esDeleteOldLogs";
-import { DhcpService } from "rest.portal/service/dhcpService";
-import { BroadcastService } from "rest.portal/service/broadcastService";
-import { DeviceLogToES } from "./deviceLogToES";
 
 async function createRedis() {
     return new RedisService(process.env.REDIS_HOST, process.env.REDIS_PASS);
@@ -47,7 +47,6 @@ async function main() {
         await syslog.start();
     }
 
-
     const leader = new Leader('job.log', redis, process.env.REDIS_HOST || 'localhost');
     //await leader.start();
 
@@ -72,7 +71,6 @@ async function main() {
 
     const deleteOldEsLogs = new ESDeleteOldLogs(configService);
     await deleteOldEsLogs.start();
-
 
     process.on('SIGINT', async () => {
         logger.warn("sigint catched");
@@ -104,7 +102,6 @@ async function main() {
         process.exit(0);
 
     });
-
 
 }
 

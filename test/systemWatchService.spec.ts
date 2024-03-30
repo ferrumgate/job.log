@@ -1,10 +1,8 @@
-
 import chai from 'chai';
 import { ConfigService, RedisService, SessionService, SystemLogService, TunnelService, User, Util } from 'rest.portal';
-import { SystemWatchService } from '../src/systemWatchService';
-import { Leader } from '../src/leader';
-import { DhcpService } from 'rest.portal/service/dhcpService';
 import { BroadcastService } from 'rest.portal/service/broadcastService';
+import { DhcpService } from 'rest.portal/service/dhcpService';
+import { SystemWatchService } from '../src/systemWatchService';
 
 const expect = chai.expect;
 
@@ -68,15 +66,11 @@ describe('systemWatchService ', async () => {
         const s3 = await watch.getSession(session3.id);
         expect(s3).exist;
 
-
-
         await watch.loadAllTunnels();
         const t1 = await watch.getTunnel(tunnel1.id);
         expect(t1).exist;
         const t2 = await watch.getTunnel(tunnel2.id);
         expect(t2).exist;
-
-
 
     }).timeout(20000);
 });

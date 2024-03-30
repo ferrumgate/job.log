@@ -1,7 +1,6 @@
-import { ConfigService, ESService, ESServiceLimited, logger } from "rest.portal";
+import { ConfigService, ESServiceLimited, logger } from "rest.portal";
 import { ConfigWatch } from "rest.portal/model/config";
 const { setIntervalAsync, clearIntervalAsync } = require('set-interval-async');
-
 
 export class ESServiceLimitedExtended extends ESServiceLimited {
     /**

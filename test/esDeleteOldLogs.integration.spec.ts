@@ -1,21 +1,12 @@
-
 import chai from 'chai';
-
-import { ActivityLog, AuditLog, AuditService, ConfigService, DeviceLog, ESService, RedisService, RedisWatcherService, Util } from 'rest.portal';
-import { Leader } from '../src/leader';
-import { AuditLogToES } from '../src/auditLogToES';
-
+import { ActivityLog, ConfigService, DeviceLog, ESService, RedisService, Util } from 'rest.portal';
 import { ActivityLogToES } from '../src/activityLogToES';
-import { ESDeleteOldLogs } from '../src/esDeleteOldLogs';
-import { BroadcastService } from 'rest.portal/service/broadcastService';
 import { DeviceLogToES } from '../src/deviceLogToES';
-
+import { ESDeleteOldLogs } from '../src/esDeleteOldLogs';
+import { Leader } from '../src/leader';
 import { esHost, esPass, esUser } from './common.spec';
 
-
 const expect = chai.expect;
-
-
 
 describe('esDeleteOldLogs ', async () => {
     const redis = new RedisService();
@@ -24,7 +15,6 @@ describe('esDeleteOldLogs ', async () => {
         await redis.flushAll();
 
     })
-
 
     const streamKey = '/logs/audit';
     function createSampleData() {
@@ -75,9 +65,7 @@ describe('esDeleteOldLogs ', async () => {
         console.log(indexes2);
         expect(indexes.length - indexes2.length).to.equal(1);
 
-
     }).timeout(200000);
-
 
     const streamKey2 = '/logs/device';
     function createSampleData2() {
@@ -98,7 +86,6 @@ describe('esDeleteOldLogs ', async () => {
             serial: 'asdfaf',
             userId: 'asdfafa',
             username: 'adfasdfawe',
-
 
         }
 
@@ -150,10 +137,7 @@ describe('esDeleteOldLogs ', async () => {
         console.log(indexes2);
         expect(indexes.length - indexes2.length).to.equal(1);
 
-
     }).timeout(200000);
 
-
 })
-
 
