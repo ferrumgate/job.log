@@ -19,6 +19,8 @@
             ],
             "env": {
                 "REDIS_HOST": "localhost:6379",
+                "ENCRYPT_KEY": "nf0jd52ptlxdvkp1sd9c3n3foy80uog9",
+                "MODULE_ACTIVITY_TO_ES": "true"
             },
             "outputCapture": "console",
             "preLaunchTask": "build"
