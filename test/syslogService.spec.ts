@@ -97,7 +97,7 @@ describe('syslogService', () => {
             totalCount += result.length;
             if (!result.length)
                 break;
-            result.forEach(x => pos = x.xreadPos);
+            result.forEach((x: any) => pos = x.xreadPos);
         }
         expect(totalCount).to.equal(2000);
 
