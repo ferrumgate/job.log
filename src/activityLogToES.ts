@@ -1,6 +1,5 @@
 import { ActivityLog, ConfigService, ESService, ESServiceExtended, logger, RedisService, Util, WatchGroupService, WatchItem } from "rest.portal";
 import { Leader } from "./leader";
-import { ESServiceLimitedExtended } from "./service/esServiceExtended";
 const { setIntervalAsync, clearIntervalAsync } = require('set-interval-async');
 
 /**
@@ -31,10 +30,7 @@ export class ActivityLogToES {
 
     createESService(): ESService {
 
-        if (process.env.LIMITED_MODE == 'true')
-            return new ESServiceLimitedExtended(this.configService);
-        else
-            return new ESServiceExtended(this.configService);
+        return new ESServiceExtended(this.configService);
     }
 
     async start() {

@@ -4,7 +4,6 @@ import { DhcpService } from "rest.portal/service/dhcpService";
 import { ActivityLogToES } from "./activityLogToES";
 import { AuditLogToES } from "./auditLogToES";
 import { DeviceLogToES } from "./deviceLogToES";
-import { ESDeleteOldLogs } from "./esDeleteOldLogs";
 import { Leader } from "./leader";
 import { SvcActivityLogParser } from "./svcActivityLogParser";
 import { SyslogUdpService } from "./syslogService";
@@ -69,8 +68,6 @@ async function main() {
         await svcParser.start();
     }
 
-    const deleteOldEsLogs = new ESDeleteOldLogs(configService);
-    await deleteOldEsLogs.start();
 
     process.on('SIGINT', async () => {
         logger.warn("sigint catched");
@@ -82,7 +79,6 @@ async function main() {
         await systemWatchService.stop();
         await configService.stop();
         await svcParser?.stop();
-        await deleteOldEsLogs?.stop();
         logger.warn("sigint catched");
         process.exit(0);
 
@@ -97,7 +93,6 @@ async function main() {
         await systemWatchService.stop();
         await configService.stop();
         await svcParser?.stop();
-        await deleteOldEsLogs?.stop();
         logger.warn("sigterm catched");
         process.exit(0);
 
