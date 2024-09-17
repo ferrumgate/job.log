@@ -1,6 +1,5 @@
 import { ActivityLog, ESService, ESServiceExtended, fqdnCategoriesMap, logger, RedisConfigWatchCachedService, RedisService, Util, WatchGroupService, WatchItem } from "rest.portal";
 import { PolicyAuthzErrors } from "rest.portal/service/policyService";
-import { ESServiceLimitedExtended } from "./service/esServiceExtended";
 import { SystemWatchService } from "./systemWatchService";
 
 export class SvcActivityLogParser {
@@ -25,10 +24,7 @@ export class SvcActivityLogParser {
 
     }
     protected createESService() {
-        if (process.env.LIMITED_MODE == 'true')
-            return new ESServiceLimitedExtended(this.configService, process.env.ES_HOST, process.env.ES_USER, process.env.ES_PASS);
-        else
-            return new ESServiceExtended(this.configService, process.env.ES_HOST, process.env.ES_USER, process.env.ES_PASS);
+        return new ESServiceExtended(this.configService, process.env.ES_HOST, process.env.ES_USER, process.env.ES_PASS);
     }
     async createAFakeRecord() {
         try {
