@@ -24,7 +24,7 @@ export class AuditLogToES {
 
     }
     createESService(): ESService {
-        return new ESServiceExtended(this.configService);
+        return ESServiceExtended.create(this.configService);
     }
 
     async start() {

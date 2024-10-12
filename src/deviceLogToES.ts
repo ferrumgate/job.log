@@ -29,7 +29,7 @@ export class DeviceLogToES {
     }
 
     createESService(): ESService {
-        return new ESServiceExtended(this.configService);
+        return ESServiceExtended.create(this.configService);
     }
 
     async start() {

@@ -24,7 +24,7 @@ export class SvcActivityLogParser {
 
     }
     protected createESService() {
-        return new ESServiceExtended(this.configService, process.env.ES_HOST, process.env.ES_USER, process.env.ES_PASS);
+        return ESServiceExtended.create(this.configService, process.env.ES_HOST, process.env.ES_USER, process.env.ES_PASS);
     }
     async createAFakeRecord() {
         try {
